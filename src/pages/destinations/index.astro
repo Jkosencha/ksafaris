@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import DestinationCard from '../../components/DestinationCard.astro';
+import { COMING_SOON } from '../../consts';
+
+const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const description =
+  'Safari destinations across East Africa: Kenya, Tanzania, Uganda, Rwanda and Zanzibar — with ground handling by a local, award-winning team.';
+---
+
+<BaseLayout title="Destinations" description={description}>
+  <PageHero
+    eyebrow="Where we go"
+    title="East Africa, handled by locals"
+    lead="We manage everything on the ground, from the moment you touch down to the last day of your stay."
+  />
+  <section class="container-page mt-12">
+    <h2 class="sr-only">Destinations</h2>
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      {destinations.map((d) => <DestinationCard destination={d} />)}
+    </div>
+    <p class="mt-10 rounded-2xl border border-dashed border-sand-300 p-5 text-center text-bark-700">
+      <span class="font-semibold text-bark-900">Coming soon to Southern Africa:</span>
+      {COMING_SOON.join(', ')}.
+    </p>
+  </section>
+</BaseLayout>

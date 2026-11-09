@@ -1,0 +1,150 @@
+title: 13 Days Kenya Tanzania Expedition
+summary: >-
+  A fly-in luxury expedition across two countries: the Chyulu Hills beneath Kilimanjaro, the Maasai
+  Mara, the northern and central Serengeti, the Ngorongoro Crater and Lake Manyara.
+durationDays: 13
+destinations: [kenya, tanzania]
+route:
+  - Nairobi
+  - Chyulu Hills
+  - Maasai Mara
+  - Northern Serengeti (Kogatende)
+  - Central Serengeti (Seronera)
+  - Ngorongoro Crater
+  - Lake Manyara
+heroImage: ../../assets/images/tours/13-days-kenya-tanzania-expedition.jpg
+heroAlt: A herd of elephants on the plains with snow-capped Mount Kilimanjaro behind
+featured: true
+order: 1
+
+itinerary:
+  - day: 1
+    title: Arrival – Nairobi
+    description: |-
+      Jambo and welcome to Kenya! On arrival at the airport, you will be met by our experienced guide and the regional Manager. After a short briefing, you will be transferred to your Boutique Hotel within Kenya’s capital, Nairobi. Relax and enjoy the beautiful serenity of the business hub of Africa.
+    overnight: Kempinski Villa Rosa Hotel
+    mealPlan: Bed & Breakfast
+
+  - day: 2
+    title: Nairobi – Chyulu Hills
+    description: |-
+      After a buffet breakfast, you will be transferred to Wilson Airport for your scheduled flight to Chyulu Hills, a spectacular region framed by rolling hills and distant Mt. Kilimanjaro. Upon arrival, you will have a game drive en route to your luxury lodge. In the evening, you will have a game drive, then back to the Lodge. After dinner, enjoy gazing up at the constellations in the Southern skies from your rooftop sky bed.
+    overnight: Ol Donyo Lodge
+    mealPlan: Full Board (B, L, D)
+
+  - day: 3
+    title: Inside the Chyulu Hills
+    description: |-
+      Spend the entire day inside this beautiful National Park. You will embark upon early morning and late afternoon game drives. Among the predators and prey, spot herds of large-tusked, free-ranging elephant that meander in the swamps and grasslands. In addition to elephant, the area is also home to Cape buffalo, impala, lion, cheetah, spotted hyena, giraffe, zebra and wildebeest as well as a great variety of birdlife. Members of the Maasai tribe also live here, sharing the land with local conservation efforts.
+
+      All meals will be served at your Lodge/Camp.
+    overnight: Ol Donyo Lodge
+    mealPlan: Full Board (B, L, D)
+
+  - day: 4
+    title: Chyulu Hills – Maasai Mara Game Reserve
+    description: |-
+      After breakfast this morning, you will be transferred to the airstrip for your departure flight to Nairobi, where upon arrival you connect to another flight to the Maasai Mara Game Reserve, with its striking landscapes of wide plains interlaced with seasonal rivers. Throughout the year, the Masai Mara is an unforgettable place of natural drama, a kaleidoscope of vibrant color and life. Arrive in time for lunch, later an evening drive into this vast reserve.
+
+      Return for dinner and overnight at your Camp/Lodge.
+    overnight: Olare Mara Kempinski
+    mealPlan: Full Board
+
+  - day: 5
+    title: Inside the Maasai Mara Game Reserve
+    description: |-
+      Today, you will embark upon early morning and late afternoon game drives in the Maasai Mara. The famed “Big Five” – elephant, rhino, lion, leopard and buffalo – all roam the reserve, together with hundreds of other species, from cheetah and crocodile to endangered wild dog and magnificent birds of prey. You can sight some dramatic action in this vast national reserve estimated to be slightly over 1,500 square kilometres; the cats run to catch some prey, the vultures search for carcasses as they clean up the park. All meals and overnight will be at your Camp.
+
+      NB: Today you may have the option of a balloon ride (extra cost) followed by a bush breakfast.
+    overnight: Olare Mara Kempinski
+    mealPlan: Full Board
+
+  - day: 6
+    title: Maasai Mara Game Reserve – Northern Serengeti
+    description: |-
+      After breakfast in the Maasai Mara, you will be transferred to the airstrip for your scheduled flight to Northern Serengeti. Arrive Nairobi and connect to a flight to the Serengeti area. On arrival at Kogatende airstrip, meet with our driver guide for an afternoon game drive en route to your camp for dinner and overnight.
+    overnight: Ole Sereai Tented Camp
+
+  - day: 7
+    title: Serengeti National Park (Kogatende)
+    description: |-
+      On your second day in Tanzania’s Serengeti, you will embark on an early morning game drive in the Serengeti National Park and then drive back to the Lodge for breakfast. With your lunch boxes, you will depart the Lodge and continue your game drive in the Serengeti National Park. Driving through the Serengeti is an authentic blend of the magical experience of the Tanzanian wilderness and wildlife. The Park is also famous for the annual migration when millions of wildebeest migrate to Maasai Mara Game Reserve in Kenya. Viewing the migration is an epic safari experience. It provides visitors a phenomenal pictorial and magnificently moving scene to the naked eye. For those who enjoy photography, Serengeti’s vast open savannah provides an incredible backdrop to even the amateur photographer. The beauty of the Serengeti lies in its unimaginably vast plains filled with all wildlife, and allows visitors to roam the plains and embrace the magic of the wilderness. You will view antelopes, lions, leopards, wildebeest, zebras and much wildlife here.
+
+      You will continue your afternoon drive in the Serengeti. As the sun sets, the horizon of the Serengeti is movingly serene, giving you an unexpected calmness in the African wilderness. After your spectacular day of game viewing, you will retire for the night.
+    overnight: Ole Sereai Tented Camp
+
+  - day: 8
+    title: Kogatende – Serengeti National Park (Central)
+    description: |-
+      After breakfast, collect lunch boxes and transfer to Kogatende airstrip, departing at 09:25 on your scheduled flight and arriving at Serengeti Seronera at 10:30. Meet with our driver guide and transfer for your game drive in the central part of Serengeti National Park.
+
+      The Serengeti National Park in the Maasai language means “endless plains” and is clothed with vast breath-taking landscapes; driving through the Serengeti is an authentic blend of the magical experience of Tanzanian wilderness and wildlife. It is the second largest national park in Tanzania and covers about 6,000 square miles of savannah, grasslands, hills, woodland and riverine forests. The Serengeti National Park is also famous for the annual migration when millions of wildebeest migrate to Maasai Mara Game Reserve in Kenya. The beauty of the Serengeti lies in its unimaginably vast plains filled with a variety of wildlife, and allows visitors to roam the plains and embrace the magic of the wilderness. You will enjoy an exceptional evening game drive sighting lions, elephant, elands, hyenas, cheetahs, jackals, hippos, crocodiles, zebras, leopards, buffalos, gazelle, giraffes, topi, ostrich and hartebeest among many others. The Park is filled with a vast variety of Tanzania’s best wildlife and habitats that make for an incredible game viewing experience.
+
+      You then drive to Serengeti Sopa Lodge where you will spend the night.
+    overnight: Serengeti Sopa Lodge
+
+  - day: 9
+    title: Serengeti National Park (Central)
+    description: |-
+      Today you will embark on an early morning game drive in the Serengeti National Park and then drive back to the Lodge for breakfast. With your lunch boxes, drive to Seronera for your game drive. Driving through the Serengeti is an authentic blend of the magical experience of the Tanzanian wilderness and wildlife. The Park is also famous for the annual migration when millions of wildebeest migrate to Maasai Mara Game Reserve in Kenya. Viewing the migration is an epic safari experience. For those who enjoy photography, Serengeti’s vast open savannah provides an incredible backdrop to even the amateur photographer. You will view antelopes, lions, leopards, wildebeest, zebras and much wildlife here.
+
+      You will continue your afternoon drive in the Serengeti. As the sun sets, the horizon of the Serengeti is movingly serene, giving you an unexpected calmness in the African wilderness. After your spectacular day of game viewing, you will retire for the night at Serengeti Sopa Lodge.
+    overnight: Serengeti Sopa Lodge
+
+  - day: 10
+    title: Serengeti National Park – Ngorongoro Conservation Area
+    description: |-
+      After breakfast, collect lunch boxes and transfer to Seronera airstrip for your scheduled flight to Lake Manyara airstrip, departing at 10:45 and arriving at 11:25. Meet with our driver and transfer to the Ngorongoro Conservation Area for dinner and overnight.
+    overnight: Ngorongoro Serena Safari Lodge
+    mealPlan: Full Board
+
+  - day: 11
+    title: Ngorongoro Conservation Area
+    description: |-
+      After breakfast, collect lunch boxes and drive to the Ngorongoro Conservation Area, descending into the Ngorongoro Crater for a full-day crater tour. The Ngorongoro Conservation Area, which borders the Serengeti, is home to approximately 30,000 protected animals. Its infinite beauty and grace is unique: a deep crater valley ringed by highlands, with a soda lake where thousands of animals quench their thirst daily.
+
+      It is at the Ngorongoro that you will relish the privilege of viewing the Big Five in one location. The Big Five are characteristically imposing, enormous and dangerous animals; these include the rare black rhino, big-tusked elephants, black-maned lions, leopards and buffalo. You will also sight zebras, hyenas, wildebeest, flamingos, bat-eared foxes, jackals, gazelles, cheetah and a high density of bird species. The beauty of this place is that the lions are not afraid to walk up to your safari vehicles, giving you an authentic safari experience.
+
+      Later in the evening, drive to your Lodge for dinner and overnight.
+    overnight: Ngorongoro Serena Safari Lodge
+    mealPlan: Full Board
+
+  - day: 12
+    title: Ngorongoro Conservation Area – Lake Manyara National Park
+    description: |-
+      After breakfast, collect lunch boxes and drive to Lake Manyara National Park for an afternoon game drive. From the entrance gate, you will drive along winding roads into the Park’s dense forest-like landscape, filled with acacia woodlands. The Park derives its name from the vast alkaline soda-ash lake, which can be spotted shimmering spectacularly. During your game drive, you will sight several troops of baboons relaxing by the roadside. Further into your excursion a variety of wildlife will emerge including enormous elephants, graceful giraffes, zebras, bushbucks, dik-dik, wildebeest, buffalos, mongoose, klipspringer and plenty of birdlife.
+
+      The Park is rich in birdlife with approximately 400 species. Along the lake you will view pink flamingos and other water birds like storks, pelicans and cormorants. Lake Manyara National Park is also famous for its tree-climbing lions, which you may see, particularly in the early mornings. If you are lucky enough to see a pride of lions lounging in a tree, it can be an extraordinary sight.
+
+      Evening drive to your lodge for dinner and overnight.
+    overnight: Lake Manyara Kilimamoja Lodge
+
+  - day: 13
+    title: Lake Manyara – Nairobi (Wilson) – Depart
+    description: |-
+      After breakfast, collect lunch boxes and drive to Lake Manyara airstrip for your scheduled flight to Nairobi, departing at 11:25 and arriving at Wilson Airport at 15:40. Upon arrival, you will be met and transferred to Jomo Kenyatta International Airport for your departure flight back home, at least 3 hours before your scheduled departure.
+
+      Thank you for travelling with us!
+
+included:
+  - Airport transfers to and from the airport and airstrips
+  - Accommodation on Full Board basis as indicated
+  - Shared game drives as indicated
+  - Day trip & game drives in Amboseli National Park
+  - Park entry fees and conservancy fees
+  - All local flights within Kenya and Tanzania as indicated in the itinerary
+  - Maasai village visits in Kenya
+  - Horseback riding in Chyulu
+  - House soft drinks, selected local beers and laundry
+  - Sundowners
+  - Nature walks in the Maasai Mara
+  - Tourism development levy and 18% VAT
+
+excluded:
+  - International flights
+  - Visas and visa fees (between US$50 and US$200 depending on nationality)
+  - Tips and gratuities
+  - Items of personal use
+  - Extra activities, e.g. balloon rides (US$500 per person)
+  - Sole use of vehicle
+  - Other items not mentioned above

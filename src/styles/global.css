@@ -1,0 +1,101 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+@import 'tailwindcss';
+
+/* Earthy safari palette.
+   Text-safe pairings: bark-900 on sand-50; white on terracotta-700 / acacia-700 / bark-900;
+   bark-900 on ochre-400. Avoid ochre-500 for small text on light backgrounds. */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+
+  --color-sand-50: #fbf7f0;
+  --color-sand-100: #f4ecdd;
+  --color-sand-200: #e8d9bd;
+  --color-sand-300: #d8c199;
+
+  --color-ochre-300: #e8b86a;
+  --color-ochre-400: #dca04a;
+  --color-ochre-500: #c8862f;
+  --color-ochre-600: #a96c1f;
+  --color-ochre-700: #85541a;
+
+  --color-terracotta-500: #c0603d;
+  --color-terracotta-600: #a8472b;
+  --color-terracotta-700: #8a3a23;
+
+  --color-acacia-500: #78864c;
+  --color-acacia-600: #5d6b3a;
+  --color-acacia-700: #4a552e;
+  --color-acacia-800: #3a4325;
+
+  --color-bark-600: #6e5641;
+  --color-bark-700: #574332;
+  --color-bark-800: #3d2f22;
+  --color-bark-900: #2b2118;
+
+  --color-whatsapp: #1f8f4e;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-sand-50 font-sans text-bark-900 antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-balance;
+    font-optical-sizing: auto;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ochre-600;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@utility container-page {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
+}
+@utility btn-primary {
+  @apply btn bg-terracotta-700 text-white hover:bg-terracotta-600;
+}
+@utility btn-accent {
+  @apply btn bg-ochre-400 text-bark-900 hover:bg-ochre-300;
+}
+@utility btn-outline {
+  @apply btn border border-current hover:bg-white/10;
+}
+@utility eyebrow {
+  @apply text-xs font-semibold tracking-[0.18em] text-ochre-700 uppercase;
+}
+/* Long-form copy from the content collections */
+@utility prose-safari {
+  @apply max-w-none text-base leading-relaxed text-bark-800;
+  & > * + * {
+    @apply mt-4;
+  }
+  & h2 {
+    @apply mt-10 text-2xl font-semibold text-bark-900;
+  }
+  & h3 {
+    @apply mt-8 text-xl font-semibold text-bark-900;
+  }
+  & ul {
+    @apply list-disc space-y-1 pl-5;
+  }
+  & a {
+    @apply font-medium text-terracotta-700 underline underline-offset-2 hover:text-terracotta-600;
+  }
+}

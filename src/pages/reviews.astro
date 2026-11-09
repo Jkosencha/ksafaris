@@ -1,0 +1,99 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { SOCIAL } from '../consts';
+
+const reviews = (await getCollection('reviews')).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+const tourTitles = new Map<string, string>();
+for (const r of reviews) {
+  if (r.data.tour && !tourTitles.has(r.data.tour.id)) {
+    const t = await getEntry(r.data.tour);
+    if (t) tourTitles.set(t.id, t.data.title);
+  }
+}
+
+const description =
+  'Read independent reviews of KSafaris & African Expeditions on Tripadvisor and SafariBookings.';
+const platforms = [
+  { name: 'Tripadvisor', href: SOCIAL.tripadvisor, icon: 'tripadvisor' as const, text: 'Guest reviews and photos from our safaris.' },
+  { name: 'SafariBookings', href: SOCIAL.safaribookings, icon: 'award' as const, text: 'Africa’s largest safari review platform.' },
+];
+---
+
+<BaseLayout title="Reviews" description={description}>
+  <PageHero
+    eyebrow="Reviews"
+    title="What our travellers say"
+    lead="We’re proud to be rated by our guests on independent review platforms. Read their stories — and if you’ve travelled with us, we’d love to hear yours."
+  />
+
+  <section aria-label="Review platforms" class="container-page mt-12 grid gap-6 sm:grid-cols-2">
+    {
+      platforms.map((p) => (
+        <a
+          href={p.href}
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center gap-5 rounded-2xl bg-white p-6 ring-1 ring-sand-200 transition hover:ring-ochre-500"
+        >
+          <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-acacia-700 text-white">
+            <Icon name={p.icon} class="size-7" />
+          </span>
+          <span>
+            <span class="block font-display text-xl font-semibold">Read our reviews on {p.name}</span>
+            <span class="mt-1 block text-sm text-bark-700">{p.text}</span>
+          </span>
+          <Icon name="arrow" class="ml-auto size-5 shrink-0 text-terracotta-700 transition group-hover:translate-x-1" />
+        </a>
+      ))
+    }
+  </section>
+
+  {
+    reviews.length > 0 && (
+      <section aria-labelledby="guest-reviews" class="container-page mt-16">
+        <h2 id="guest-reviews" class="text-3xl font-semibold">Guest reviews</h2>
+        <ul class="mt-6 grid gap-6 md:grid-cols-2">
+          {reviews.map((r) => (
+            <li>
+              <figure class="h-full rounded-2xl bg-white p-6 ring-1 ring-sand-200">
+                {r.data.rating && (
+                  <p class="text-ochre-600" aria-label={`${r.data.rating} out of 5`}>
+                    {'★'.repeat(r.data.rating)}
+                    <span class="text-sand-300">{'★'.repeat(5 - r.data.rating)}</span>
+                  </p>
+                )}
+                <blockquote class="mt-3 font-display text-lg leading-relaxed text-bark-900">“{r.data.quote}”</blockquote>
+                <figcaption class="mt-4 text-sm text-bark-700">
+                  <span class="font-semibold text-bark-900">{r.data.author}</span>
+                  {r.data.country && <>, {r.data.country}</>}
+                  {r.data.tour && tourTitles.get(r.data.tour.id) && (
+                    <> · <a href={`/tours/${r.data.tour.id}`} class="underline underline-offset-2">{tourTitles.get(r.data.tour.id)}</a></>
+                  )}
+                  <span class="block">
+                    via {r.data.sourceUrl ? <a href={r.data.sourceUrl} target="_blank" rel="noopener" class="underline underline-offset-2">{r.data.source}</a> : r.data.source}
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="container-page mt-16">
+    <div class="rounded-3xl bg-sand-100 px-6 py-10 text-center sm:px-12">
+      <h2 class="text-2xl font-semibold sm:text-3xl">Travelled with us?</h2>
+      <p class="mx-auto mt-2 max-w-lg text-bark-700">A short review helps other travellers find us — thank you.</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <a href={SOCIAL.tripadvisor} target="_blank" rel="noopener" class="btn-primary">Review on Tripadvisor</a>
+        <a href={SOCIAL.safaribookings} target="_blank" rel="noopener" class="btn border border-terracotta-700 text-terracotta-700 hover:bg-terracotta-700/5">Review on SafariBookings</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

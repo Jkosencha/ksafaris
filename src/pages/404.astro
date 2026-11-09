@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="This page could not be found." noindex>
+  <section class="container-page py-24 text-center">
+    <p class="eyebrow">404</p>
+    <h1 class="mt-2 text-4xl font-semibold sm:text-5xl">This trail goes cold</h1>
+    <p class="mx-auto mt-4 max-w-md text-bark-700">The page you were looking for has moved or no longer exists.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="/" class="btn-primary">Back to home</a>
+      <a href="/tours" class="btn border border-bark-900 hover:bg-sand-100">Browse tours</a>
+    </div>
+  </section>
+</BaseLayout>

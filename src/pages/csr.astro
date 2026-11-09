@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import csrImage from '../assets/images/csr.jpg';
+import { SITE } from '../consts';
+
+const description =
+  'How KSafaris & African Expeditions supports communities in Kenya: Namelok Naretoi Home for the Handicapped in Narok and GLIKEP in Lodwar.';
+---
+
+<BaseLayout title="Corporate Social Responsibility" description={description}>
+  <PageHero eyebrow="Corporate social responsibility" title="Travel that gives back" lead={`${SITE.mission}.`} />
+
+  <div class="container-page mt-12 grid gap-12 lg:grid-cols-2">
+    <article class="rounded-2xl bg-white p-6 ring-1 ring-sand-200 sm:p-8">
+      <p class="eyebrow">Entasekera, Narok, Kenya</p>
+      <h2 class="mt-2 text-2xl font-semibold">Namelok Naretoi Home for the Handicapped</h2>
+      <div class="prose-safari mt-4">
+        <p>
+          Namelok Naretoi Home for the Handicapped cares for over 67 children with disabilities such as club feet,
+          cleft lip and palate, hydrocephalus, deafness and knock knees. It is the only home and hope for these
+          children, who were once seen as a threat because of their disabilities under local cultural beliefs.
+        </p>
+        <p>We offer our guests the opportunity to visit the centre and spend time with the children.</p>
+      </div>
+    </article>
+
+    <article class="rounded-2xl bg-white p-6 ring-1 ring-sand-200 sm:p-8">
+      <p class="eyebrow">Lodwar &amp; Sereolipi, Kenya</p>
+      <h2 class="mt-2 text-2xl font-semibold">GLIKEP — Golden Life International Foundation for Kenya Pastoralists</h2>
+      <div class="prose-safari mt-4">
+        <p>
+          GLIKEP is a non-profit, non-governmental organisation founded in 2011 and based in Lodwar and Sereolipi. It is
+          governed by an independent board of directors.
+        </p>
+        <p>
+          Having been overlooked and marginalised, pastoralist communities in the region are served by GLIKEP’s work in
+          health promotion, education, cultural preservation, conflict resolution and economic empowerment. GLIKEP
+          invites institutions, organisations and individuals to support sustainable solutions that secure the
+          livelihoods of pastoralists in East Africa.
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <figure class="container-page mt-12">
+    <Image src={csrImage} alt="Children sitting in a circle on a sandy compound, playing a game with a visitor" widths={[640, 805]} sizes="(min-width: 1152px) 1088px, 100vw" class="w-full rounded-2xl object-cover" />
+  </figure>
+
+  <section class="container-page mt-12 text-center">
+    <p class="mx-auto max-w-xl text-bark-700">
+      Would you like to include a community visit in your safari?
+    </p>
+    <a href="/contact#plan" class="btn-primary mt-4">Ask us about it</a>
+  </section>
+</BaseLayout>

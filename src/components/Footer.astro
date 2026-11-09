@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import { CONTACT, NAV, SITE, SOCIAL } from '../consts';
+import Icon from './Icon.astro';
+import ReviewBadges from './ReviewBadges.astro';
+
+const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 bg-bark-900 text-sand-100">
+  <div class="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="lg:col-span-1">
+      <p class="font-display text-2xl font-semibold text-white">{SITE.name}</p>
+      <p class="mt-2 font-display text-lg text-ochre-300 italic">“{SITE.motto}”</p>
+      <p class="mt-4 text-sm leading-relaxed text-sand-200">
+        Locally owned and operated for over {SITE.foundedYearsAgo} years. {SITE.mission}.
+      </p>
+      <p class="mt-4 inline-flex items-start gap-2 text-sm text-sand-200">
+        <Icon name="award" class="mt-0.5 size-4 shrink-0 text-ochre-300" />
+        {SITE.award}
+      </p>
+    </div>
+
+    <nav aria-label="Destinations">
+      <p class="text-sm font-semibold tracking-wider text-white uppercase">Destinations</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        {
+          destinations.map((d) => (
+            <li>
+              <a href={`/destinations/${d.id}`} class="text-sand-200 hover:text-ochre-300">
+                {d.data.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav aria-label="Company">
+      <p class="text-sm font-semibold tracking-wider text-white uppercase">Explore</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href} class="text-sand-200 hover:text-ochre-300">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div>
+      <p class="text-sm font-semibold tracking-wider text-white uppercase">Get in touch</p>
+      <ul class="mt-4 space-y-3 text-sm">
+        <li>
+          <a href={`mailto:${CONTACT.email}`} class="inline-flex items-center gap-2 break-all text-sand-200 hover:text-ochre-300">
+            <Icon name="mail" class="size-4 shrink-0" />
+            {CONTACT.email}
+          </a>
+        </li>
+        <li>
+          <a href={`tel:${CONTACT.phoneE164}`} class="inline-flex items-center gap-2 text-sand-200 hover:text-ochre-300">
+            <Icon name="phone" class="size-4 shrink-0" />
+            {CONTACT.phoneDisplay} (tel / WhatsApp)
+          </a>
+        </li>
+        <li class="inline-flex items-center gap-2 text-sand-200">
+          <Icon name="pin" class="size-4 shrink-0" />
+          {CONTACT.city}, {CONTACT.country}
+        </li>
+      </ul>
+      <ul class="mt-5 flex gap-3" aria-label="Social media">
+        <li>
+          <a href={SOCIAL.facebook} target="_blank" rel="noopener" class="flex size-10 items-center justify-center rounded-full bg-bark-800 hover:bg-terracotta-700">
+            <Icon name="facebook" class="size-4" label="Facebook" />
+          </a>
+        </li>
+        <li>
+          <a href={SOCIAL.instagram} target="_blank" rel="noopener" class="flex size-10 items-center justify-center rounded-full bg-bark-800 hover:bg-terracotta-700">
+            <Icon name="instagram" class="size-4" label="Instagram" />
+          </a>
+        </li>
+        <li>
+          <a href={SOCIAL.x} target="_blank" rel="noopener" class="flex size-10 items-center justify-center rounded-full bg-bark-800 hover:bg-terracotta-700">
+            <Icon name="x" class="size-4" label="X (Twitter)" />
+          </a>
+        </li>
+      </ul>
+      <ReviewBadges class="mt-5" />
+    </div>
+  </div>
+
+  <div class="border-t border-bark-800">
+    <div class="container-page flex flex-col gap-2 py-6 text-xs text-sand-300 sm:flex-row sm:justify-between">
+      <p>© {year} {SITE.name}. All rights reserved.</p>
+      <p>Kenya · Tanzania · Uganda · Rwanda · Zanzibar</p>
+    </div>
+  </div>
+</footer>

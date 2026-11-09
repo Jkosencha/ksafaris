@@ -1,0 +1,188 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, getEntries, type CollectionEntry } from 'astro:content';
+import { getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import TourCard from '../../components/TourCard.astro';
+import Icon from '../../components/Icon.astro';
+import { formatPrice, paragraphs } from '../../lib/format';
+import { touristTrip } from '../../lib/schema';
+
+export const getStaticPaths = (async () => {
+  const tours = await getCollection('tours');
+  return tours.map((tour) => ({ params: { slug: tour.id }, props: { tour } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  tour: CollectionEntry<'tours'>;
+}
+
+const { tour } = Astro.props;
+const { title, summary, durationDays, route, priceFrom, heroImage, heroAlt, itinerary, included, excluded } = tour.data;
+const destinations = await getEntries(tour.data.destinations);
+
+const others = (await getCollection('tours'))
+  .filter((t) => t.id !== tour.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const ogImage = await getImage({ src: heroImage, width: Math.min(1200, heroImage.width), format: 'jpg', quality: 80 });
+const jsonLd = touristTrip(
+  tour,
+  destinations,
+  new URL(Astro.url.pathname, Astro.site),
+  new URL(ogImage.src, Astro.site),
+);
+const nights = durationDays - 1;
+---
+
+<BaseLayout title={title} description={summary} image={heroImage} imageAlt={heroAlt} type="article" jsonLd={jsonLd}>
+  <PageHero title={title} eyebrow={`${durationDays} days · ${destinations.map((d) => d.data.name).join(' & ')}`} image={heroImage} imageAlt={heroAlt}>
+    <a href="#plan" class="btn-accent mt-6 self-start">Plan this safari</a>
+  </PageHero>
+
+  <nav aria-label="Breadcrumb" class="container-page pt-6 text-sm text-bark-700">
+    <ol class="flex flex-wrap gap-1">
+      <li><a href="/" class="hover:text-terracotta-700">Home</a> /</li>
+      <li><a href="/tours" class="hover:text-terracotta-700">Tours</a> /</li>
+      <li aria-current="page" class="text-bark-900">{title}</li>
+    </ol>
+  </nav>
+
+  <div class="container-page mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
+    <div>
+      <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-sand-200 ring-1 ring-sand-200 sm:grid-cols-4">
+        <div class="bg-white p-4">
+          <dt class="text-xs tracking-wide text-bark-600 uppercase">Duration</dt>
+          <dd class="mt-1 font-semibold">{durationDays} days / {nights} nights</dd>
+        </div>
+        <div class="bg-white p-4">
+          <dt class="text-xs tracking-wide text-bark-600 uppercase">Countries</dt>
+          <dd class="mt-1 font-semibold">
+            {destinations.map((d, i) => (<>{i > 0 && ', '}<a href={`/destinations/${d.id}`} class="hover:text-terracotta-700">{d.data.name}</a></>))}
+          </dd>
+        </div>
+        <div class="bg-white p-4">
+          <dt class="text-xs tracking-wide text-bark-600 uppercase">Price</dt>
+          <dd class="mt-1 font-semibold">{formatPrice(priceFrom)}</dd>
+        </div>
+        <div class="bg-white p-4">
+          <dt class="text-xs tracking-wide text-bark-600 uppercase">Style</dt>
+          <dd class="mt-1 font-semibold">Private, tailor-made</dd>
+        </div>
+      </dl>
+
+      <p class="mt-8 text-lg leading-relaxed text-bark-800">{summary}</p>
+
+      {
+        route.length > 0 && (
+          <div class="mt-6">
+            <h2 class="sr-only">Route</h2>
+            <ol class="flex flex-wrap items-center gap-2 text-sm">
+              {route.map((stop, i) => (
+                <li class="flex items-center gap-2">
+                  {i > 0 && <span aria-hidden="true" class="text-ochre-600">→</span>}
+                  <span class="rounded-full bg-acacia-700/10 px-3 py-1 font-medium text-acacia-800">{stop}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )
+      }
+
+      <section aria-labelledby="itinerary" class="mt-12">
+        <h2 id="itinerary" class="text-3xl font-semibold">Day-by-day itinerary</h2>
+        <ol class="mt-6 space-y-0">
+          {
+            itinerary.map((day) => (
+              <li class="relative border-l-2 border-sand-300 pb-10 pl-8 last:border-transparent last:pb-0">
+                <span class="absolute top-0 -left-[1.1rem] flex h-8 min-w-8 items-center justify-center rounded-full bg-terracotta-700 px-2 text-xs font-bold whitespace-nowrap text-white">
+                  {day.day}
+                </span>
+                <h3 class="text-xl font-semibold">
+                  <span class="sr-only">Day {day.day}: </span>
+                  {day.title}
+                </h3>
+                <div class="prose-safari mt-3">
+                  {paragraphs(day.description).map((p) => (
+                    <p>{p}</p>
+                  ))}
+                </div>
+                {(day.overnight || day.mealPlan) && (
+                  <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-xl bg-sand-100 px-4 py-3 text-sm">
+                    {day.overnight && (
+                      <div class="flex items-center gap-2">
+                        <Icon name="bed" class="size-4 text-acacia-700" />
+                        <dt class="font-medium">Overnight:</dt>
+                        <dd>{day.overnight}</dd>
+                      </div>
+                    )}
+                    {day.mealPlan && (
+                      <div class="flex items-center gap-2">
+                        <Icon name="plate" class="size-4 text-acacia-700" />
+                        <dt class="font-medium">Meals:</dt>
+                        <dd>{day.mealPlan}</dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      {
+        (included.length > 0 || excluded.length > 0) && (
+          <section aria-labelledby="inclusions" class="mt-14">
+            <h2 id="inclusions" class="text-3xl font-semibold">What’s included</h2>
+            <div class="mt-6 grid gap-6 sm:grid-cols-2">
+              <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+                <h3 class="text-lg font-semibold text-acacia-700">Included</h3>
+                <ul class="mt-3 space-y-2 text-sm">
+                  {included.map((item) => (
+                    <li class="flex gap-2">
+                      <Icon name="check" class="mt-0.5 size-4 shrink-0 text-acacia-600" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
+                <h3 class="text-lg font-semibold text-terracotta-700">Not included</h3>
+                <ul class="mt-3 space-y-2 text-sm">
+                  {excluded.map((item) => (
+                    <li class="flex gap-2">
+                      <Icon name="x_mark" class="mt-0.5 size-4 shrink-0 text-terracotta-600" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p class="mt-4 text-sm text-bark-700">
+              Every itinerary can be tailored — change the pace, lodges, or add a beach extension.
+            </p>
+          </section>
+        )
+      }
+    </div>
+
+    <aside class="lg:sticky lg:top-28 lg:self-start">
+      <EnquiryForm tour={title} />
+    </aside>
+  </div>
+
+  {
+    others.length > 0 && (
+      <section aria-labelledby="more-tours" class="container-page mt-20">
+        <h2 id="more-tours" class="text-3xl font-semibold">More safaris</h2>
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {others.map((t) => <TourCard tour={t} />)}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
