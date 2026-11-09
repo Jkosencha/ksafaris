@@ -40,6 +40,9 @@
 }
 
 @layer base {
+  h2 {
+    @apply uppercase;
+  }
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -87,8 +90,9 @@
 @utility btn-outline {
   @apply btn border border-current hover:bg-white/10;
 }
+/* Handwritten accent above headings */
 @utility eyebrow {
-  @apply text-xs font-semibold tracking-[0.18em] text-ochre-700 uppercase;
+  @apply font-hand text-2xl leading-tight text-ochre-700 sm:text-3xl;
 }
 /* Long-form copy from the content collections */
 @utility prose-safari {

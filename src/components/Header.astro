@@ -11,7 +11,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 <header class="sticky top-0 z-40 border-b border-sand-200 bg-sand-50/95 backdrop-blur">
   <div class="hidden bg-bark-900 text-sand-100 sm:block">
     <div class="container-page flex h-9 items-center justify-between text-xs">
-      <p class="font-display italic">“{SITE.motto}”</p>
+      <p class="font-hand text-base">{SITE.motto}</p>
       <div class="flex items-center gap-5">
         <a href={`mailto:${CONTACT.email}`} class="inline-flex items-center gap-1.5 hover:text-ochre-300">
           <Icon name="mail" class="size-3.5" />

@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import TornEdge from './TornEdge.astro';
 
 interface Props {
   title: string;
@@ -26,21 +27,23 @@ const { title, eyebrow, lead, image, imageAlt = '' } = Astro.props;
         class="absolute inset-0 -z-10 size-full object-cover"
       />
       <div class="absolute inset-0 -z-10 bg-gradient-to-t from-bark-900/90 via-bark-900/50 to-bark-900/20" />
-      <div class="container-page flex min-h-[22rem] flex-col justify-end py-10 sm:min-h-[28rem] sm:py-14">
-        {eyebrow && <p class="text-xs font-semibold tracking-[0.18em] text-ochre-300 uppercase">{eyebrow}</p>}
-        <h1 class="mt-2 max-w-3xl text-4xl font-semibold text-white sm:text-5xl">{title}</h1>
+      <div class="container-page flex min-h-[24rem] flex-col justify-end pt-12 pb-16 sm:min-h-[30rem] sm:pb-20">
+        {eyebrow && <p class="font-hand text-2xl text-ochre-300 sm:text-3xl">{eyebrow}</p>}
+        <h1 class="mt-2 max-w-3xl text-4xl text-white uppercase sm:text-6xl">{title}</h1>
         {lead && <p class="mt-4 max-w-2xl text-base text-sand-100 sm:text-lg">{lead}</p>}
         <slot />
       </div>
+      <TornEdge />
     </section>
   ) : (
-    <section class="border-b border-sand-200 bg-sand-100">
-      <div class="container-page py-12 sm:py-16">
+    <section class="relative bg-sand-100">
+      <div class="container-page pt-12 pb-16 sm:pt-16 sm:pb-20">
         {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-        <h1 class="mt-2 max-w-3xl text-4xl font-semibold sm:text-5xl">{title}</h1>
+        <h1 class="mt-2 max-w-3xl text-4xl uppercase sm:text-6xl">{title}</h1>
         {lead && <p class="mt-4 max-w-2xl text-base text-bark-700 sm:text-lg">{lead}</p>}
         <slot />
       </div>
+      <TornEdge />
     </section>
   )
 }

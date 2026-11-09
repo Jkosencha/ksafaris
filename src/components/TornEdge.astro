@@ -1,0 +1,33 @@
+---
+/**
+ * Ragged, torn-paper edge used to blend a photo or coloured band into the next section.
+ * Place it inside a `relative` container. The fill colour should match the neighbouring section
+ * (the one below for `bottom`, the one above for `top`).
+ */
+interface Props {
+  /** Which edge of the parent to sit on. */
+  position?: 'top' | 'bottom';
+  /** Tailwind text colour class; the SVG fills with currentColor. */
+  color?: string;
+  flip?: boolean;
+  class?: string;
+}
+
+const { position = 'bottom', color = 'text-sand-50', flip = false, class: className = '' } = Astro.props;
+const transform = [position === 'top' ? 'rotate-180' : '', flip ? '-scale-x-100' : ''].join(' ');
+---
+
+<svg
+  class:list={[
+    'pointer-events-none absolute inset-x-0 h-6 w-full sm:h-10',
+    position === 'top' ? '-top-px' : '-bottom-px',
+    color,
+    transform,
+    className,
+  ]}
+  viewBox="0 0 1440 48"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <path fill="currentColor" d="M0 48 L0 25.3 L18 27.8 L33 25.5 L64 26.2 L96 24.6 L126 24.2 L142 25.4 L158 22.6 L189 24.0 L221 22.3 L242 29.1 L274 35.8 L306 35.6 L321 40.7 L336 37.4 L354 35.0 L372 37.1 L404 32.2 L423 27.7 L455 28.2 L480 19.0 L496 21.6 L529 15.1 L560 16.5 L584 17.5 L612 17.9 L633 23.5 L654 17.3 L677 22.1 L701 23.4 L724 20.6 L740 14.0 L767 11.1 L791 7.7 L820 7.2 L836 9.4 L868 9.0 L892 5.6 L917 10.5 L949 16.8 L965 19.5 L987 18.8 L1003 16.4 L1026 24.0 L1054 21.1 L1080 26.5 L1105 16.6 L1133 18.4 L1166 15.0 L1181 16.2 L1204 16.3 L1225 20.9 L1254 21.4 L1282 28.8 L1304 36.8 L1331 39.6 L1353 39.4 L1378 39.4 L1404 40.8 L1422 30.4 L1440 20 L1440 48 Z" />
+</svg>

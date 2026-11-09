@@ -36,10 +36,27 @@ const jsonLd = touristTrip(
   new URL(ogImage.src, Astro.site),
 );
 const nights = durationDays - 1;
+const facts = [
+  { icon: 'clock', label: 'Duration', value: `${durationDays} days / ${nights} nights` },
+  { icon: 'pin', label: 'Countries', value: destinations.map((d) => d.data.name).join(', ') },
+  { icon: 'tag', label: 'Price', value: formatPrice(priceFrom) },
+  { icon: 'award', label: 'Style', value: 'Private, tailor-made' },
+] as const;
 ---
 
 <BaseLayout title={title} description={summary} image={heroImage} imageAlt={heroAlt} type="article" jsonLd={jsonLd}>
   <PageHero title={title} eyebrow={`${durationDays} days · ${destinations.map((d) => d.data.name).join(' & ')}`} image={heroImage} imageAlt={heroAlt}>
+    <dl class="mt-8 grid max-w-3xl grid-cols-2 overflow-hidden rounded-2xl border border-white/25 bg-bark-900/35 text-white backdrop-blur-sm sm:grid-cols-4">
+      {
+        facts.map((f) => (
+          <div class="flex flex-col items-center gap-1 border-white/20 p-4 text-center max-sm:odd:border-r max-sm:nth-[-n+2]:border-b sm:not-last:border-r">
+            <Icon name={f.icon} class="size-6 text-ochre-300" />
+            <dt class="text-[0.7rem] tracking-[0.15em] text-sand-200 uppercase">{f.label}</dt>
+            <dd class="text-sm font-medium">{f.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
     <a href="#plan" class="btn-accent mt-6 self-start">Plan this safari</a>
   </PageHero>
 
@@ -53,28 +70,7 @@ const nights = durationDays - 1;
 
   <div class="container-page mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
     <div>
-      <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-sand-200 ring-1 ring-sand-200 sm:grid-cols-4">
-        <div class="bg-white p-4">
-          <dt class="text-xs tracking-wide text-bark-600 uppercase">Duration</dt>
-          <dd class="mt-1 font-semibold">{durationDays} days / {nights} nights</dd>
-        </div>
-        <div class="bg-white p-4">
-          <dt class="text-xs tracking-wide text-bark-600 uppercase">Countries</dt>
-          <dd class="mt-1 font-semibold">
-            {destinations.map((d, i) => (<>{i > 0 && ', '}<a href={`/destinations/${d.id}`} class="hover:text-terracotta-700">{d.data.name}</a></>))}
-          </dd>
-        </div>
-        <div class="bg-white p-4">
-          <dt class="text-xs tracking-wide text-bark-600 uppercase">Price</dt>
-          <dd class="mt-1 font-semibold">{formatPrice(priceFrom)}</dd>
-        </div>
-        <div class="bg-white p-4">
-          <dt class="text-xs tracking-wide text-bark-600 uppercase">Style</dt>
-          <dd class="mt-1 font-semibold">Private, tailor-made</dd>
-        </div>
-      </dl>
-
-      <p class="mt-8 text-lg leading-relaxed text-bark-800">{summary}</p>
+      <p class="text-lg leading-relaxed text-bark-800">{summary}</p>
 
       {
         route.length > 0 && (
@@ -137,7 +133,9 @@ const nights = durationDays - 1;
       {
         (included.length > 0 || excluded.length > 0) && (
           <section aria-labelledby="inclusions" class="mt-14">
-            <h2 id="inclusions" class="text-3xl font-semibold">What’s included</h2>
+            <h2 id="inclusions" class="text-3xl">
+              Trip price <span class="text-terracotta-700">· {priceFrom ? `from US$${priceFrom.toLocaleString('en-US')} per person` : 'on request'}</span>
+            </h2>
             <div class="mt-6 grid gap-6 sm:grid-cols-2">
               <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
                 <h3 class="text-lg font-semibold text-acacia-700">Included</h3>

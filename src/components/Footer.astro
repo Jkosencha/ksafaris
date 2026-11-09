@@ -3,16 +3,18 @@ import { getCollection } from 'astro:content';
 import { CONTACT, NAV, SITE, SOCIAL } from '../consts';
 import Icon from './Icon.astro';
 import ReviewBadges from './ReviewBadges.astro';
+import TornEdge from './TornEdge.astro';
 
 const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-24 bg-bark-900 text-sand-100">
+<footer class="relative mt-24 bg-bark-900 pt-6 text-sand-100">
+  <TornEdge position="top" />
   <div class="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
     <div class="lg:col-span-1">
       <p class="font-display text-2xl font-semibold text-white">{SITE.name}</p>
-      <p class="mt-2 font-display text-lg text-ochre-300 italic">“{SITE.motto}”</p>
+      <p class="mt-2 font-hand text-2xl text-ochre-300">{SITE.motto}</p>
       <p class="mt-4 text-sm leading-relaxed text-sand-200">
         Locally owned and operated for over {SITE.foundedYearsAgo} years. {SITE.mission}.
       </p>
