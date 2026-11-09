@@ -1,5 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SplitFeature from '../components/SplitFeature.astro';
+import leopardImage from '../assets/images/destinations/kenya.jpg';
+import plainsImage from '../assets/images/placeholders/mara-plains.jpg';
+import heroImage from '../assets/images/placeholders/mara-lioness-vehicle.jpg';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import { COMING_SOON, SITE, TRAVELLER_TYPES } from '../consts';
@@ -9,7 +13,7 @@ const description =
 ---
 
 <BaseLayout title="About Us" description={description}>
-  <PageHero eyebrow="About us" title="A locally owned safari company, built in Kenya" lead={`“${SITE.motto}.”`} />
+  <PageHero image={heroImage} imageAlt="A young lioness in long grass watched by guests in an open-roof safari vehicle" eyebrow="About us" title="A locally owned safari company, built in Kenya" lead={`“${SITE.motto}.”`} />
 
   <div class="container-page mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
     <div class="prose-safari text-lg">
@@ -34,13 +38,13 @@ const description =
     </div>
 
     <aside class="space-y-6 lg:self-start">
-      <div class="rounded-2xl bg-white p-6 ring-1 ring-mist-200">
+      <div class="rounded-md bg-white p-6 ring-1 ring-mist-200">
         <h2 class="text-sm font-semibold tracking-wider text-ink-600 uppercase">Our mission</h2>
         <p class="mt-2 font-display text-2xl text-ink-900">{SITE.mission}</p>
         <h2 class="mt-6 text-sm font-semibold tracking-wider text-ink-600 uppercase">Our motto</h2>
         <p class="mt-2 font-display text-2xl text-ink-900">{SITE.motto}</p>
       </div>
-      <div class="flex gap-3 rounded-2xl bg-reed-300/20 p-6">
+      <div class="flex gap-3 rounded-md bg-reed-300/20 p-6">
         <Icon name="award" class="size-8 shrink-0 text-reed-700" />
         <div>
           <p class="font-semibold">Best Tour Agency of the Year 2022</p>
@@ -49,6 +53,24 @@ const description =
       </div>
     </aside>
   </div>
+
+  <section class="container-page mt-16 space-y-6">
+    <SplitFeature image={leopardImage} alt="A leopard asleep along the branch of an acacia tree" tone="sage">
+      <p class="eyebrow">What we do</p>
+      <h2 class="mt-2 text-3xl">Ground handling, start to finish</h2>
+      <p class="mt-4 leading-relaxed text-ink-800">
+        From the moment you touch down to your final transfer home, our own team looks after every detail: guides,
+        vehicles, lodges, flights and permits. One local company, one point of contact.
+      </p>
+    </SplitFeature>
+    <SplitFeature image={plainsImage} alt="Open grassland of the Maasai Mara with a lone acacia tree" reverse tone="olive">
+      <p class="font-hand text-2xl text-reed-300 sm:text-3xl">Coming soon</p>
+      <h2 class="mt-2 text-3xl text-white">Southern Africa</h2>
+      <p class="mt-4 leading-relaxed text-mist-100">
+        After more than a decade in East Africa, we are expanding to {COMING_SOON.join(', ').replace(/, ([^,]*)$/, ' and $1')}.
+      </p>
+    </SplitFeature>
+  </section>
 
   <section aria-labelledby="who" class="container-page mt-16">
     <h2 id="who" class="text-3xl font-semibold">Who we travel with</h2>
@@ -61,7 +83,7 @@ const description =
           ['Group', 'Families, friends, clubs and special-interest groups.'],
           ['MICE', 'Meetings, conferences, events and team building.'],
         ].map(([t, d]) => (
-          <li class="rounded-2xl bg-white p-5 ring-1 ring-mist-200">
+          <li class="rounded-md bg-white p-5 ring-1 ring-mist-200">
             <h3 class="text-lg font-semibold">{t}</h3>
             <p class="mt-1 text-sm text-ink-700">{d}</p>
           </li>
@@ -72,7 +94,7 @@ const description =
   </section>
 
   <section class="container-page mt-16">
-    <div class="rounded-3xl bg-moss-800 px-6 py-10 text-center text-mist-50 sm:px-12">
+    <div class="rounded-md bg-moss-800 px-6 py-10 text-center text-mist-50 sm:px-12">
       <h2 class="text-3xl font-semibold text-white">Let’s start planning</h2>
       <p class="mx-auto mt-2 max-w-lg text-mist-100">Say where, we’ll take you there.</p>
       <a href="/contact#plan" class="btn-accent mt-6">Plan my safari</a>

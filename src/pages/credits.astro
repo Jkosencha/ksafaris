@@ -15,7 +15,7 @@ if (PHOTO_CREDITS.length === 0) return Astro.redirect('/');
       Some photographs on this site are shared by their photographers on Wikimedia Commons under Creative Commons
       licences.
     </p>
-    <ul class="mt-8 divide-y divide-mist-300 rounded-2xl bg-white ring-1 ring-mist-200">
+    <ul class="mt-8 divide-y divide-mist-300 rounded-md bg-white ring-1 ring-mist-200">
       {
         PHOTO_CREDITS.map((c) => (
           <li class="p-5 text-sm">

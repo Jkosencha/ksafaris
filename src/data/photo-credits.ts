@@ -39,6 +39,14 @@ export const PHOTO_CREDITS: PhotoCredit[] = [
       'https://commons.wikimedia.org/wiki/File:Lioness_and_safari_vehicle_in_Maasai_Mara_National_Reserve,_Kenya.jpg',
   },
   {
+    file: 'placeholders/mara-plains.jpg',
+    subject: 'Wildebeest and Thomson gazelle in Maasai Mara, Kenya',
+    author: 'Daniel Case',
+    license: 'CC BY-SA 4.0',
+    licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    source: 'https://commons.wikimedia.org/wiki/File:Wildebeest_and_Thomson_gazelle_in_Maasai_Mara,_Kenya.jpg',
+  },
+  {
     file: 'placeholders/serengeti-lion.jpg',
     subject: 'Male lion prowling in the Serengeti National Park',
     author: 'Giles Laurent',

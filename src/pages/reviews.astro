@@ -1,6 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import heroImage from '../assets/images/placeholders/amboseli-elephant.jpg';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import { SOCIAL } from '../consts';
@@ -25,8 +26,8 @@ const platforms = [
 ---
 
 <BaseLayout title="Reviews" description={description}>
-  <PageHero
-    eyebrow="Reviews"
+  <PageHero image={heroImage} imageAlt="Two elephants grazing in the Amboseli swamps below Mount Kilimanjaro" 
+        eyebrow="Reviews"
     title="What our travellers say"
     lead="We’re proud to be rated by our guests on independent review platforms. Read their stories, and if you’ve travelled with us, we’d love to hear yours."
   />
@@ -38,7 +39,7 @@ const platforms = [
           href={p.href}
           target="_blank"
           rel="noopener"
-          class="group flex items-center gap-5 rounded-2xl bg-white p-6 ring-1 ring-mist-200 transition hover:ring-reed-500"
+          class="group flex items-center gap-5 rounded-md bg-white p-6 ring-1 ring-mist-200 transition hover:ring-reed-500"
         >
           <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-moss-700 text-white">
             <Icon name={p.icon} class="size-7" />
@@ -60,7 +61,7 @@ const platforms = [
         <ul class="mt-6 grid gap-6 md:grid-cols-2">
           {reviews.map((r) => (
             <li>
-              <figure class="h-full rounded-2xl bg-white p-6 ring-1 ring-mist-200">
+              <figure class="h-full rounded-md bg-white p-6 ring-1 ring-mist-200">
                 {r.data.rating && (
                   <p class="text-reed-500" aria-label={`${r.data.rating} out of 5`}>
                     {'★'.repeat(r.data.rating)}
@@ -87,7 +88,7 @@ const platforms = [
   }
 
   <section class="container-page mt-16">
-    <div class="rounded-3xl bg-mist-100 px-6 py-10 text-center sm:px-12">
+    <div class="rounded-md bg-mist-100 px-6 py-10 text-center sm:px-12">
       <h2 class="text-2xl font-semibold sm:text-3xl">Travelled with us?</h2>
       <p class="mx-auto mt-2 max-w-lg text-ink-700">A short review helps other travellers find us. Thank you!</p>
       <div class="mt-6 flex flex-wrap justify-center gap-3">

@@ -11,7 +11,7 @@ const { destination, headingLevel: Heading = 'h3' } = Astro.props;
 const { name, tagline, heroImage, heroAlt } = destination.data;
 ---
 
-<article class="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-ink-900 sm:aspect-[3/4]">
+<article class="group relative aspect-[4/5] overflow-hidden rounded-md bg-ink-900 sm:aspect-[3/4]">
   <Image
     src={heroImage}
     alt={heroAlt}

@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import heroImage from '../assets/images/placeholders/amboseli-kilimanjaro.jpg';
 import PageHero from '../components/PageHero.astro';
 import csrImage from '../assets/images/csr.jpg';
 import { SITE } from '../consts';
@@ -10,10 +11,10 @@ const description =
 ---
 
 <BaseLayout title="Corporate Social Responsibility" description={description}>
-  <PageHero eyebrow="Corporate social responsibility" title="Travel that gives back" lead={`${SITE.mission}.`} />
+  <PageHero image={heroImage} imageAlt="Elephants in a flowering meadow in Amboseli, with Mount Kilimanjaro behind" eyebrow="Corporate social responsibility" title="Travel that gives back" lead={`${SITE.mission}.`} />
 
   <div class="container-page mt-12 grid gap-12 lg:grid-cols-2">
-    <article class="rounded-2xl bg-white p-6 ring-1 ring-mist-200 sm:p-8">
+    <article class="rounded-md bg-white p-6 ring-1 ring-mist-200 sm:p-8">
       <p class="eyebrow">Entasekera, Narok, Kenya</p>
       <h2 class="mt-2 text-2xl font-semibold">Namelok Naretoi Home for the Handicapped</h2>
       <div class="prose-safari mt-4">
@@ -26,7 +27,7 @@ const description =
       </div>
     </article>
 
-    <article class="rounded-2xl bg-white p-6 ring-1 ring-mist-200 sm:p-8">
+    <article class="rounded-md bg-white p-6 ring-1 ring-mist-200 sm:p-8">
       <p class="eyebrow">Lodwar &amp; Sereolipi, Kenya</p>
       <h2 class="mt-2 text-2xl font-semibold">GLIKEP: Golden Life International Foundation for Kenya Pastoralists</h2>
       <div class="prose-safari mt-4">
@@ -45,7 +46,7 @@ const description =
   </div>
 
   <figure class="container-page mt-12">
-    <Image src={csrImage} alt="Children sitting in a circle on a sandy compound, playing a game with a visitor" widths={[640, 805]} sizes="(min-width: 1152px) 1088px, 100vw" class="w-full rounded-2xl object-cover" />
+    <Image src={csrImage} alt="Children sitting in a circle on a sandy compound, playing a game with a visitor" widths={[640, 805]} sizes="(min-width: 1152px) 1088px, 100vw" class="w-full rounded-md object-cover" />
   </figure>
 
   <section class="container-page mt-12 text-center">

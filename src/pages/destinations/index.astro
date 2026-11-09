@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import heroImage from '../../assets/images/placeholders/mara-plains.jpg';
 import PageHero from '../../components/PageHero.astro';
 import DestinationCard from '../../components/DestinationCard.astro';
 import { COMING_SOON } from '../../consts';
@@ -11,8 +12,8 @@ const description =
 ---
 
 <BaseLayout title="Destinations" description={description}>
-  <PageHero
-    eyebrow="Where we go"
+  <PageHero image={heroImage} imageAlt="A wildebeest and a Thomson’s gazelle on the open grassland of the Maasai Mara" 
+        eyebrow="Where we go"
     title="East Africa, handled by locals"
     lead="We manage everything on the ground, from the moment you touch down to the last day of your stay."
   />
@@ -21,7 +22,7 @@ const description =
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {destinations.map((d) => <DestinationCard destination={d} />)}
     </div>
-    <p class="mt-10 rounded-2xl border border-dashed border-mist-300 p-5 text-center text-ink-700">
+    <p class="mt-10 rounded-md border border-dashed border-mist-300 p-5 text-center text-ink-700">
       <span class="font-semibold text-ink-900">Coming soon to Southern Africa:</span>
       {COMING_SOON.join(', ')}.
     </p>

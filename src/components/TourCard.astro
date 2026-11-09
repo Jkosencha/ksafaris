@@ -13,7 +13,7 @@ const { tour, headingLevel: Heading = 'h3' } = Astro.props;
 const { title, summary, durationDays, route, priceFrom, heroImage, heroAlt } = tour.data;
 ---
 
-<article class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-mist-200 transition hover:shadow-md">
+<article class="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-mist-200 transition hover:shadow-md">
   <div class="relative aspect-[3/2] overflow-hidden">
     <Image
       src={heroImage}

@@ -1,0 +1,39 @@
+---
+/**
+ * Photo beside text, alternating sides (Poveda reference design).
+ * Text goes in the default slot.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  /** Put the photo on the right instead of the left (from md up). */
+  reverse?: boolean;
+  /** Background of the text half. */
+  tone?: 'light' | 'sage' | 'olive';
+}
+
+const { image, alt, reverse = false, tone = 'light' } = Astro.props;
+const toneClass = {
+  light: 'bg-mist-100 text-ink-900',
+  sage: 'bg-mist-300 text-ink-900',
+  olive: 'bg-moss-700 text-mist-50',
+}[tone];
+---
+
+<div class="grid overflow-hidden rounded-md md:grid-cols-2">
+  <div class:list={['relative min-h-72 md:min-h-[26rem]', reverse && 'md:order-2']}>
+    <Image
+      src={image}
+      alt={alt}
+      widths={[480, 800, 1200]}
+      sizes="(min-width: 768px) 50vw, 100vw"
+      class="absolute inset-0 size-full object-cover"
+    />
+  </div>
+  <div class:list={['flex flex-col justify-center p-8 sm:p-12', toneClass]}>
+    <slot />
+  </div>
+</div>

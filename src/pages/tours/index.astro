@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import heroImage from '../../assets/images/placeholders/ngorongoro-nature.jpg';
 import PageHero from '../../components/PageHero.astro';
 import TourCard from '../../components/TourCard.astro';
 
@@ -10,8 +11,8 @@ const description =
 ---
 
 <BaseLayout title="Safari Tours & Itineraries" description={description}>
-  <PageHero
-    eyebrow="Our products"
+  <PageHero image={heroImage} imageAlt="An elephant crossing a dirt track in front of safari vehicles in the Ngorongoro Crater" 
+        eyebrow="Our products"
     title="Safari tours & itineraries"
     lead="Start from one of our favourite routes, then let us shape it around you. Every safari is private and fully tailor-made."
   />
@@ -20,7 +21,7 @@ const description =
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {tours.map((tour) => <TourCard tour={tour} />)}
     </div>
-    <div class="mt-12 rounded-2xl bg-moss-800 p-6 text-mist-50 sm:flex sm:items-center sm:justify-between sm:p-8">
+    <div class="mt-12 rounded-md bg-moss-800 p-6 text-mist-50 sm:flex sm:items-center sm:justify-between sm:p-8">
       <div>
         <p class="font-display text-2xl font-semibold text-white">Don’t see your perfect trip?</p>
         <p class="mt-1 text-mist-100">Gorilla trekking, Zanzibar beaches, corporate and MICE travel. Say where, we’ll take you there.</p>
