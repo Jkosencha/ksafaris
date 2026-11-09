@@ -2,7 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 import { SITE, SOCIAL } from '../consts';
-import defaultOgImage from '../assets/images/lake-nakuru-rhinos.jpg';
+import defaultOgImage from '../assets/images/placeholders/amboseli-kilimanjaro.jpg';
 
 export interface SEOProps {
   title?: string;
@@ -17,7 +17,7 @@ const {
   title,
   description = SITE.description,
   image = defaultOgImage,
-  imageAlt = 'Rhinos grazing beside Lake Nakuru, Kenya',
+  imageAlt = 'A family of elephants walking through a flowering meadow in Amboseli, with snow-capped Mount Kilimanjaro behind',
   type = 'website',
   noindex = false,
 } = Astro.props as SEOProps;

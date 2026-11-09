@@ -7,7 +7,7 @@ import TourCard from '../components/TourCard.astro';
 import ReviewBadges from '../components/ReviewBadges.astro';
 import Icon from '../components/Icon.astro';
 import TornEdge from '../components/TornEdge.astro';
-import heroImage from '../assets/images/lake-nakuru-rhinos.jpg';
+import heroImage from '../assets/images/placeholders/amboseli-kilimanjaro.jpg';
 import logo from '../assets/images/brand/logo.png';
 import { COMING_SOON, SITE, TRAVELLER_TYPES } from '../consts';
 import { travelAgency } from '../lib/schema';
@@ -40,8 +40,8 @@ const pillars = [
   <section class="relative isolate overflow-hidden bg-ink-900">
     <Image
       src={heroImage}
-      alt="Three white rhinos grazing beside Lake Nakuru, with flamingos lining the shore behind"
-      widths={[640, 850]}
+      alt="A family of elephants walking through a flowering meadow in Amboseli, with snow-capped Mount Kilimanjaro behind"
+      widths={[640, 1024, 1440, 2000]}
       sizes="100vw"
       loading="eager"
       fetchpriority="high"

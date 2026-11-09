@@ -4,8 +4,8 @@ tagline: Land of a Thousand Hills
 summary: >-
   Mountain gorillas and golden monkeys in the Virunga volcanoes, chimpanzees in Nyungwe Forest, the
   shores of Lake Kivu and the clean, safe capital of Kigali.
-heroImage: ../../assets/images/destinations/rwanda.jpg
-heroAlt: An adult mountain gorilla and a young gorilla holding a twig among forest leaves
+heroImage: ../../assets/images/placeholders/rwanda-hills.jpg
+heroAlt: Green terraced hills and tea fields in Rwanda under a cloudy sky
 order: 4
 facts:
   capital: Kigali

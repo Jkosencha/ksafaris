@@ -4,8 +4,8 @@ tagline: The home of the safari
 summary: >-
   Over 54 national parks and reserves, the Great Migration in the Maasai Mara, Rift Valley lakes,
   Indian Ocean beaches and more than 42 communities. Kenya is where we are based and know best.
-heroImage: ../../assets/images/destinations/kenya.jpg
-heroAlt: A leopard asleep along the branch of an acacia tree
+heroImage: ../../assets/images/placeholders/mara-lioness-vehicle.jpg
+heroAlt: A young lioness sitting in long grass as guests watch from an open-roof safari vehicle in the Maasai Mara
 order: 1
 facts:
   capital: Nairobi

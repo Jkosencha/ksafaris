@@ -4,8 +4,8 @@ tagline: Endless plains and the roof of Africa
 summary: >-
   The Serengeti and its migration, the Ngorongoro Crater, Lake Manyara’s tree-climbing lions and
   Mount Kilimanjaro. East Africa’s largest country offers some of the finest game viewing on the continent.
-heroImage: ../../assets/images/destinations/tanzania.jpg
-heroAlt: A herd of elephants on the plains with snow-capped Mount Kilimanjaro behind
+heroImage: ../../assets/images/placeholders/serengeti-lion.jpg
+heroAlt: A male lion with a dark mane walking through golden grass in the Serengeti
 order: 2
 facts:
   capital: Dodoma

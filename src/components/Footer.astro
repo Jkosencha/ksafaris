@@ -4,6 +4,7 @@ import { CONTACT, NAV, SITE, SOCIAL } from '../consts';
 import Icon from './Icon.astro';
 import ReviewBadges from './ReviewBadges.astro';
 import TornEdge from './TornEdge.astro';
+import { PHOTO_CREDITS } from '../data/photo-credits';
 
 const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
@@ -98,7 +99,10 @@ const year = new Date().getFullYear();
   <div class="border-t border-moss-600">
     <div class="container-page flex flex-col gap-2 py-6 text-xs text-mist-300 sm:flex-row sm:justify-between">
       <p>© {year} {SITE.name}. All rights reserved.</p>
-      <p>Kenya · Tanzania · Uganda · Rwanda · Zanzibar</p>
+      <p>
+        Kenya · Tanzania · Uganda · Rwanda · Zanzibar
+        {PHOTO_CREDITS.length > 0 && (<> · <a href="/credits" class="underline underline-offset-2 hover:text-reed-300">Photo credits</a></>)}
+      </p>
     </div>
   </div>
 </footer>

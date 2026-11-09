@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { PHOTO_CREDITS } from '../data/photo-credits';
+
+// No placeholder photos left: don't build the page.
+export const prerender = true;
+if (PHOTO_CREDITS.length === 0) return Astro.redirect('/');
+---
+
+<BaseLayout title="Photo credits" description="Credits for photographs used on this website." noindex>
+  <PageHero eyebrow="With thanks" title="Photo credits" />
+  <section class="container-page mt-12">
+    <p class="max-w-2xl text-ink-700">
+      Some photographs on this site are shared by their photographers on Wikimedia Commons under Creative Commons
+      licences.
+    </p>
+    <ul class="mt-8 divide-y divide-mist-300 rounded-2xl bg-white ring-1 ring-mist-200">
+      {
+        PHOTO_CREDITS.map((c) => (
+          <li class="p-5 text-sm">
+            <a href={c.source} target="_blank" rel="noopener" class="font-medium text-moss-700 underline underline-offset-2">
+              {c.subject}
+            </a>
+            <span class="text-ink-700">
+              {' '}by {c.author},{' '}
+              <a href={c.licenseUrl} target="_blank" rel="noopener license" class="underline underline-offset-2">
+                {c.license}
+              </a>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
