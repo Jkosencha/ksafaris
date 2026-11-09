@@ -15,7 +15,7 @@ highlights:
   - name: Volcanoes National Park
     description: >-
       Gorilla and golden-monkey trekking in the Virunga Mountains, and the grave of zoologist Dian
-      Fossey — about 1½ hours from Kigali by road.
+      Fossey, about 1½ hours from Kigali by road.
   - name: Nyungwe Forest National Park
     description: The region’s most extensive montane rainforest, with chimpanzees and many other primates.
   - name: Akagera National Park
@@ -42,5 +42,5 @@ north of the country. As well as mountain gorillas, it is home to rare golden mo
 a profusion of exotic birds. Gorilla tracking is the main attraction, but you can also visit the grave
 of Dian Fossey, who studied gorillas in Rwanda for many years, explore caves and track golden monkeys.
 
-Trekking can be reasonably strenuous — up to six hours at relatively high altitude — but the experience
+Trekking can be reasonably strenuous, taking up to six hours at relatively high altitude, but the experience
 will last a lifetime.

@@ -152,7 +152,7 @@ const label = 'block text-sm font-medium text-bark-800';
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
         status.className = 'text-sm font-medium text-acacia-700';
-        status.textContent = 'Asante! Your enquiry has been sent — we’ll be in touch within one working day.';
+        status.textContent = 'Asante! Your enquiry has been sent. We’ll be in touch within one working day.';
       } catch {
         status.className = 'text-sm font-medium text-terracotta-700';
         status.textContent = `Sorry, something went wrong. Please email ${form.dataset.email} or message us on WhatsApp.`;

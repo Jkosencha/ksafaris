@@ -44,7 +44,7 @@ const tours = defineCollection({
       title: z.string(),
       summary: z.string(),
       durationDays: z.number().int().positive(),
-      /** Countries/regions visited — must match a destinations entry id. */
+      /** Countries/regions visited. Must match a destinations entry id. */
       destinations: z.array(reference('destinations')).min(1),
       /** Stops along the route, in order (parks, lakes, towns). */
       route: z.array(z.string()).default([]),
@@ -60,7 +60,7 @@ const tours = defineCollection({
     }),
 });
 
-/** Real guest reviews only — copy them (with permission) from Tripadvisor / SafariBookings. */
+/** Real guest reviews only. Copy them (with permission) from Tripadvisor / SafariBookings. */
 const reviews = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/reviews' }),
   schema: z.object({

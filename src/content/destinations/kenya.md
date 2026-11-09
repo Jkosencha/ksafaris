@@ -3,7 +3,7 @@ name: Kenya
 tagline: The home of the safari
 summary: >-
   Over 54 national parks and reserves, the Great Migration in the Maasai Mara, Rift Valley lakes,
-  Indian Ocean beaches and more than 42 communities — Kenya is where we are based and know best.
+  Indian Ocean beaches and more than 42 communities. Kenya is where we are based and know best.
 heroImage: ../../assets/images/destinations/kenya.jpg
 heroAlt: A leopard asleep along the branch of an acacia tree
 order: 1
@@ -23,7 +23,7 @@ highlights:
     description: Big-tusked elephant herds beneath Mount Kilimanjaro.
   - name: Samburu National Reserve
     description: >-
-      Home of the “Samburu Special Five” — gerenuk, Somali ostrich, Beisa oryx, reticulated giraffe
+      Home of the “Samburu Special Five”: gerenuk, Somali ostrich, Beisa oryx, reticulated giraffe
       and Grevy’s zebra.
   - name: Ol Pejeta Conservancy
     description: Rhino sanctuary and home of the world’s last northern white rhinos.
@@ -55,5 +55,5 @@ monuments and museums to show for it. Better still, the warm weather all year ro
 visit any time of the year.
 
 With over 42 ethnic communities across 47 counties, Kenyans proudly embrace their individual cultures
-and traditions while recognising the importance of national solidarity — captured in the motto
+and traditions while recognising the importance of national solidarity, captured in the motto
 “Harambee”, Swahili for “pulling together”.

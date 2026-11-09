@@ -22,7 +22,7 @@ const {
   noindex = false,
 } = Astro.props as SEOProps;
 
-const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.motto}`;
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.motto}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const og = await getImage({ src: image, width: Math.min(1200, image.width), format: 'jpg', quality: 80 });
 const ogUrl = new URL(og.src, Astro.site);

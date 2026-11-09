@@ -9,7 +9,7 @@ export const SITE = {
   motto: 'Say where, we’ll take you there',
   mission: 'Creating lasting memories through sustainable travel',
   foundedYearsAgo: 12,
-  award: 'Best Tour Agency of the Year 2022 — People’s Choice Awards',
+  award: 'Best Tour Agency of the Year 2022, People’s Choice Awards',
   locale: 'en_GB',
 };
 

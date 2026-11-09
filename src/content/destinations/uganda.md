@@ -32,7 +32,7 @@ nights. With Mount Elgon in the east and the Rwenzori Mountains in the west, the
 tropical, with daytime temperatures averaging around 26°C. The highlands are considerably cooler,
 especially at night.
 
-Uganda is home to two of Africa’s most important freshwater bodies — Lake Victoria and the River Nile —
+Uganda is home to two of Africa’s most important freshwater bodies, Lake Victoria and the River Nile,
 along with the dense Mabira Forest, Bwindi Impenetrable Forest, Kibale Forest, and the mountains of
 Elgon and Rwenzori with their caves, gorges, hot springs and waterfalls.
 

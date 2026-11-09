@@ -3,7 +3,7 @@ name: Tanzania
 tagline: Endless plains and the roof of Africa
 summary: >-
   The Serengeti and its migration, the Ngorongoro Crater, Lake Manyara’s tree-climbing lions and
-  Mount Kilimanjaro — East Africa’s largest country offers some of the finest game viewing on the continent.
+  Mount Kilimanjaro. East Africa’s largest country offers some of the finest game viewing on the continent.
 heroImage: ../../assets/images/destinations/tanzania.jpg
 heroAlt: A herd of elephants on the plains with snow-capped Mount Kilimanjaro behind
 order: 2
@@ -30,7 +30,7 @@ highlights:
 
 The largest country in East Africa, Tanzania boasts the highest mountain on the continent, the exotic
 spice islands of historic Zanzibar, and the famous Serengeti National Park, whose seemingly endless
-plains stage one of the greatest spectacles of animal behaviour — the annual migration of millions of
+plains stage one of the greatest spectacles of animal behaviour: the annual migration of millions of
 wildebeest and zebra, followed by their predators.
 
 The Great Rift Valley gives rise to the unique geological formations of the magnificent Ngorongoro

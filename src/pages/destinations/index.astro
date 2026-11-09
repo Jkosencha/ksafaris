@@ -7,7 +7,7 @@ import { COMING_SOON } from '../../consts';
 
 const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
 const description =
-  'Safari destinations across East Africa: Kenya, Tanzania, Uganda, Rwanda and Zanzibar — with ground handling by a local, award-winning team.';
+  'Safari destinations across East Africa: Kenya, Tanzania, Uganda, Rwanda and Zanzibar, with ground handling by a local, award-winning team.';
 ---
 
 <BaseLayout title="Destinations" description={description}>
