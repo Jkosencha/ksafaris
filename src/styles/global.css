@@ -1,13 +1,15 @@
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/commissioner';
+@import '@fontsource/marcellus';
+@import '@fontsource/nothing-you-could-do';
 @import 'tailwindcss';
 
 /* Earthy safari palette.
    Text-safe pairings: bark-900 on sand-50; white on terracotta-700 / acacia-700 / bark-900;
    bark-900 on ochre-400. Avoid ochre-500 for small text on light backgrounds. */
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'Commissioner Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Marcellus', ui-serif, Georgia, serif;
+  --font-hand: 'Nothing You Could Do', cursive;
 
   --color-sand-50: #fbf7f0;
   --color-sand-100: #f4ecdd;
@@ -50,7 +52,15 @@
   h3,
   h4 {
     @apply font-display text-balance;
-    font-optical-sizing: auto;
+  }
+  /* Marcellus ships a single weight: never fake a bold. */
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-synthesis: none;
+    letter-spacing: 0.01em;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ochre-600;
