@@ -37,7 +37,7 @@ const pillars = [
 ---
 
 <BaseLayout jsonLd={travelAgency(new URL(logoImg.src, Astro.site).href)}>
-  <section class="relative isolate overflow-hidden bg-bark-900">
+  <section class="relative isolate overflow-hidden bg-ink-900">
     <Image
       src={heroImage}
       alt="Three white rhinos grazing beside Lake Nakuru, with flamingos lining the shore behind"
@@ -47,17 +47,17 @@ const pillars = [
       fetchpriority="high"
       class="absolute inset-0 -z-10 size-full object-cover"
     />
-    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-bark-900/90 via-bark-900/60 to-bark-900/10"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-900/90 via-ink-900/60 to-ink-900/10"></div>
     <div class="container-page flex min-h-[32rem] flex-col justify-center py-16 sm:min-h-[38rem]">
-      <p class="inline-flex items-center gap-2 self-start rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-sand-100 ring-1 ring-white/20 backdrop-blur">
-        <Icon name="award" class="size-4 text-ochre-300" />
+      <p class="inline-flex items-center gap-2 self-start rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-mist-100 ring-1 ring-white/20 backdrop-blur">
+        <Icon name="award" class="size-4 text-reed-300" />
         Best Tour Agency of the Year 2022
       </p>
       <h1 class="mt-6 max-w-3xl text-white">
-        <span class="block font-hand text-3xl text-ochre-300 sm:text-4xl">Say where,</span>
+        <span class="block font-hand text-3xl text-reed-300 sm:text-4xl">Say where,</span>
         <span class="mt-2 block text-5xl leading-[1.05] uppercase sm:text-7xl">we’ll take you there</span>
       </h1>
-      <p class="mt-5 max-w-xl text-lg text-sand-100">
+      <p class="mt-5 max-w-xl text-lg text-mist-100">
         Tailor-made safaris across Kenya, Tanzania, Uganda, Rwanda and Zanzibar, designed and run by a locally owned East African team.
       </p>
       <div class="mt-8 flex flex-wrap gap-3">
@@ -72,26 +72,26 @@ const pillars = [
     <div>
       <p class="eyebrow">About KSafaris</p>
       <h2 id="intro" class="mt-2 text-3xl font-semibold sm:text-4xl">Your destination specialists for East Africa</h2>
-      <p class="mt-5 text-lg leading-relaxed text-bark-800">
+      <p class="mt-5 text-lg leading-relaxed text-ink-800">
         KSafaris &amp; African Expeditions is a private, locally owned tours and safari company founded over
         twelve years ago in Kenya. We have grown into one of the leading inbound tour operators in Eastern
         Africa, and were voted <strong>Best Tour Agency of the Year 2022</strong> at the People’s Choice Awards.
       </p>
-      <a href="/about" class="mt-6 inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-600">
+      <a href="/about" class="mt-6 inline-flex items-center gap-1 font-semibold text-moss-700 hover:text-moss-600">
         More about us <Icon name="arrow" class="size-4" />
       </a>
     </div>
-    <div class="rounded-2xl bg-sand-100 p-6 sm:p-8">
-      <p class="font-display text-2xl text-bark-900">“{SITE.mission}.”</p>
-      <p class="mt-2 text-sm font-medium text-bark-700">Our mission</p>
-      <p class="mt-6 text-sm font-semibold text-bark-900">Itineraries for every kind of traveller</p>
+    <div class="rounded-2xl bg-mist-100 p-6 sm:p-8">
+      <p class="font-display text-2xl text-ink-900">“{SITE.mission}.”</p>
+      <p class="mt-2 text-sm font-medium text-ink-700">Our mission</p>
+      <p class="mt-6 text-sm font-semibold text-ink-900">Itineraries for every kind of traveller</p>
       <ul class="mt-3 flex flex-wrap gap-2">
-        {TRAVELLER_TYPES.map((t) => <li class="rounded-full bg-white px-3 py-1 text-sm ring-1 ring-sand-300">{t}</li>)}
+        {TRAVELLER_TYPES.map((t) => <li class="rounded-full bg-white px-3 py-1 text-sm ring-1 ring-mist-300">{t}</li>)}
       </ul>
     </div>
   </section>
 
-  <section aria-labelledby="destinations" class="relative bg-sand-100 py-20 sm:py-24">
+  <section aria-labelledby="destinations" class="relative bg-mist-300 py-20 sm:py-24">
     <TornEdge position="top" flip />
     <div class="container-page">
       <div class="flex flex-wrap items-end justify-between gap-4">
@@ -99,15 +99,15 @@ const pillars = [
           <p class="eyebrow">Destinations</p>
           <h2 id="destinations" class="mt-2 text-3xl font-semibold sm:text-4xl">Where would you like to go?</h2>
         </div>
-        <a href="/destinations" class="inline-flex items-center gap-1 font-semibold text-terracotta-700">
+        <a href="/destinations" class="inline-flex items-center gap-1 font-semibold text-moss-700">
           All destinations <Icon name="arrow" class="size-4" />
         </a>
       </div>
       <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {destinations.map((d) => <DestinationCard destination={d} />)}
       </div>
-      <p class="mt-6 text-sm text-bark-700">
-        <span class="font-semibold text-bark-900">Coming soon:</span>
+      <p class="mt-6 text-sm text-ink-700">
+        <span class="font-semibold text-ink-900">Coming soon:</span>
         {COMING_SOON.join(', ')}.
       </p>
     </div>
@@ -120,7 +120,7 @@ const pillars = [
         <p class="eyebrow">Signature safaris</p>
         <h2 id="tours" class="mt-2 text-3xl font-semibold sm:text-4xl">Start with one of our favourite routes</h2>
       </div>
-      <a href="/tours" class="inline-flex items-center gap-1 font-semibold text-terracotta-700">
+      <a href="/tours" class="inline-flex items-center gap-1 font-semibold text-moss-700">
         All tours <Icon name="arrow" class="size-4" />
       </a>
     </div>
@@ -129,16 +129,16 @@ const pillars = [
     </div>
   </section>
 
-  <section aria-labelledby="why" class="relative bg-acacia-800 py-20 text-sand-50 sm:py-24">
+  <section aria-labelledby="why" class="relative bg-moss-800 py-20 text-mist-50 sm:py-24">
     <TornEdge position="top" />
     <div class="container-page">
       <h2 id="why" class="text-3xl font-semibold text-white sm:text-4xl">Why travel with us</h2>
       <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {
           pillars.map((p) => (
-            <li class="border-t-2 border-ochre-400 pt-4">
+            <li class="border-t-2 border-reed-300 pt-4">
               <h3 class="text-xl font-semibold text-white">{p.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-sand-100">{p.text}</p>
+              <p class="mt-2 text-sm leading-relaxed text-mist-100">{p.text}</p>
             </li>
           ))
         }
@@ -149,14 +149,14 @@ const pillars = [
 
   <section aria-labelledby="reviews" class="container-page py-16 text-center sm:py-20">
     <h2 id="reviews" class="text-3xl font-semibold sm:text-4xl">Read what our travellers say</h2>
-    <p class="mx-auto mt-3 max-w-xl text-bark-700">Independent reviews from guests who have travelled with us.</p>
+    <p class="mx-auto mt-3 max-w-xl text-ink-700">Independent reviews from guests who have travelled with us.</p>
     <ReviewBadges class="mt-6 justify-center" />
   </section>
 
   <section class="container-page">
-    <div class="rounded-3xl bg-terracotta-700 px-6 py-12 text-center text-white sm:px-12">
+    <div class="rounded-3xl bg-moss-700 px-6 py-12 text-center text-white sm:px-12">
       <h2 class="text-3xl font-semibold sm:text-4xl">Ready to plan your safari?</h2>
-      <p class="mx-auto mt-3 max-w-xl text-sand-100">Tell us where you dream of going. We’ll reply with a tailor-made itinerary within one working day.</p>
+      <p class="mx-auto mt-3 max-w-xl text-mist-100">Tell us where you dream of going. We’ll reply with a tailor-made itinerary within one working day.</p>
       <a href="/contact#plan" class="btn-accent mt-6 px-6 py-3 text-base">Plan my safari</a>
     </div>
   </section>

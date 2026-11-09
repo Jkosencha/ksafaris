@@ -13,7 +13,7 @@ interface Props {
   class?: string;
 }
 
-const { position = 'bottom', color = 'text-sand-50', flip = false, class: className = '' } = Astro.props;
+const { position = 'bottom', color = 'text-mist-50', flip = false, class: className = '' } = Astro.props;
 const transform = [position === 'top' ? 'rotate-180' : '', flip ? '-scale-x-100' : ''].join(' ');
 ---
 

@@ -11,7 +11,7 @@ const { destination, headingLevel: Heading = 'h3' } = Astro.props;
 const { name, tagline, heroImage, heroAlt } = destination.data;
 ---
 
-<article class="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-bark-900 sm:aspect-[3/4]">
+<article class="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-ink-900 sm:aspect-[3/4]">
   <Image
     src={heroImage}
     alt={heroAlt}
@@ -19,11 +19,11 @@ const { name, tagline, heroImage, heroAlt } = destination.data;
     sizes="(min-width: 1024px) 230px, (min-width: 640px) 33vw, 50vw"
     class="absolute inset-0 size-full object-cover opacity-90 transition duration-500 group-hover:scale-105"
   />
-  <div class="absolute inset-0 bg-gradient-to-t from-bark-900/90 via-bark-900/20 to-transparent"></div>
+  <div class="absolute inset-0 bg-gradient-to-t from-ink-900/90 via-ink-900/20 to-transparent"></div>
   <div class="absolute inset-x-0 bottom-0 p-4">
     <Heading class="text-xl font-semibold text-white sm:text-2xl">
       <a href={`/destinations/${destination.id}`} class="after:absolute after:inset-0">{name}</a>
     </Heading>
-    <p class="mt-1 text-xs text-sand-100 sm:text-sm">{tagline}</p>
+    <p class="mt-1 text-xs text-mist-100 sm:text-sm">{tagline}</p>
   </div>
 </article>

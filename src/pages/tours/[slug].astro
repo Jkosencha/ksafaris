@@ -46,12 +46,12 @@ const facts = [
 
 <BaseLayout title={title} description={summary} image={heroImage} imageAlt={heroAlt} type="article" jsonLd={jsonLd}>
   <PageHero title={title} eyebrow={`${durationDays} days · ${destinations.map((d) => d.data.name).join(' & ')}`} image={heroImage} imageAlt={heroAlt}>
-    <dl class="mt-8 grid max-w-3xl grid-cols-2 overflow-hidden rounded-2xl border border-white/25 bg-bark-900/35 text-white backdrop-blur-sm sm:grid-cols-4">
+    <dl class="mt-8 grid max-w-3xl grid-cols-2 overflow-hidden rounded-2xl border border-white/25 bg-ink-900/35 text-white backdrop-blur-sm sm:grid-cols-4">
       {
         facts.map((f) => (
           <div class="flex flex-col items-center gap-1 border-white/20 p-4 text-center max-sm:odd:border-r max-sm:nth-[-n+2]:border-b sm:not-last:border-r">
-            <Icon name={f.icon} class="size-6 text-ochre-300" />
-            <dt class="text-[0.7rem] tracking-[0.15em] text-sand-200 uppercase">{f.label}</dt>
+            <Icon name={f.icon} class="size-6 text-reed-300" />
+            <dt class="text-[0.7rem] tracking-[0.15em] text-mist-200 uppercase">{f.label}</dt>
             <dd class="text-sm font-medium">{f.value}</dd>
           </div>
         ))
@@ -60,17 +60,17 @@ const facts = [
     <a href="#plan" class="btn-accent mt-6 self-start">Plan this safari</a>
   </PageHero>
 
-  <nav aria-label="Breadcrumb" class="container-page pt-6 text-sm text-bark-700">
+  <nav aria-label="Breadcrumb" class="container-page pt-6 text-sm text-ink-700">
     <ol class="flex flex-wrap gap-1">
-      <li><a href="/" class="hover:text-terracotta-700">Home</a> /</li>
-      <li><a href="/tours" class="hover:text-terracotta-700">Tours</a> /</li>
-      <li aria-current="page" class="text-bark-900">{title}</li>
+      <li><a href="/" class="hover:text-moss-700">Home</a> /</li>
+      <li><a href="/tours" class="hover:text-moss-700">Tours</a> /</li>
+      <li aria-current="page" class="text-ink-900">{title}</li>
     </ol>
   </nav>
 
   <div class="container-page mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
     <div>
-      <p class="text-lg leading-relaxed text-bark-800">{summary}</p>
+      <p class="text-lg leading-relaxed text-ink-800">{summary}</p>
 
       {
         route.length > 0 && (
@@ -79,8 +79,8 @@ const facts = [
             <ol class="flex flex-wrap items-center gap-2 text-sm">
               {route.map((stop, i) => (
                 <li class="flex items-center gap-2">
-                  {i > 0 && <span aria-hidden="true" class="text-ochre-600">→</span>}
-                  <span class="rounded-full bg-acacia-700/10 px-3 py-1 font-medium text-acacia-800">{stop}</span>
+                  {i > 0 && <span aria-hidden="true" class="text-reed-500">→</span>}
+                  <span class="rounded-full bg-moss-700/10 px-3 py-1 font-medium text-moss-800">{stop}</span>
                 </li>
               ))}
             </ol>
@@ -93,8 +93,8 @@ const facts = [
         <ol class="mt-6 space-y-0">
           {
             itinerary.map((day) => (
-              <li class="relative border-l-2 border-sand-300 pb-10 pl-8 last:border-transparent last:pb-0">
-                <span class="absolute top-0 -left-[1.1rem] flex h-8 min-w-8 items-center justify-center rounded-full bg-terracotta-700 px-2 text-xs font-bold whitespace-nowrap text-white">
+              <li class="relative border-l-2 border-mist-300 pb-10 pl-8 last:border-transparent last:pb-0">
+                <span class="absolute top-0 -left-[1.1rem] flex h-8 min-w-8 items-center justify-center rounded-full bg-moss-700 px-2 text-xs font-bold whitespace-nowrap text-white">
                   {day.day}
                 </span>
                 <h3 class="text-xl font-semibold">
@@ -107,17 +107,17 @@ const facts = [
                   ))}
                 </div>
                 {(day.overnight || day.mealPlan) && (
-                  <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-xl bg-sand-100 px-4 py-3 text-sm">
+                  <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-xl bg-mist-100 px-4 py-3 text-sm">
                     {day.overnight && (
                       <div class="flex items-center gap-2">
-                        <Icon name="bed" class="size-4 text-acacia-700" />
+                        <Icon name="bed" class="size-4 text-moss-700" />
                         <dt class="font-medium">Overnight:</dt>
                         <dd>{day.overnight}</dd>
                       </div>
                     )}
                     {day.mealPlan && (
                       <div class="flex items-center gap-2">
-                        <Icon name="plate" class="size-4 text-acacia-700" />
+                        <Icon name="plate" class="size-4 text-moss-700" />
                         <dt class="font-medium">Meals:</dt>
                         <dd>{day.mealPlan}</dd>
                       </div>
@@ -134,33 +134,33 @@ const facts = [
         (included.length > 0 || excluded.length > 0) && (
           <section aria-labelledby="inclusions" class="mt-14">
             <h2 id="inclusions" class="text-3xl">
-              Trip price <span class="text-terracotta-700">· {priceFrom ? `from US$${priceFrom.toLocaleString('en-US')} per person` : 'on request'}</span>
+              Trip price <span class="text-moss-700">· {priceFrom ? `from US$${priceFrom.toLocaleString('en-US')} per person` : 'on request'}</span>
             </h2>
             <div class="mt-6 grid gap-6 sm:grid-cols-2">
-              <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-                <h3 class="text-lg font-semibold text-acacia-700">Included</h3>
+              <div class="rounded-2xl bg-white p-5 ring-1 ring-mist-200">
+                <h3 class="text-lg font-semibold text-moss-700">Included</h3>
                 <ul class="mt-3 space-y-2 text-sm">
                   {included.map((item) => (
                     <li class="flex gap-2">
-                      <Icon name="check" class="mt-0.5 size-4 shrink-0 text-acacia-600" />
+                      <Icon name="check" class="mt-0.5 size-4 shrink-0 text-moss-600" />
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div class="rounded-2xl bg-white p-5 ring-1 ring-sand-200">
-                <h3 class="text-lg font-semibold text-terracotta-700">Not included</h3>
+              <div class="rounded-2xl bg-white p-5 ring-1 ring-mist-200">
+                <h3 class="text-lg font-semibold text-moss-700">Not included</h3>
                 <ul class="mt-3 space-y-2 text-sm">
                   {excluded.map((item) => (
                     <li class="flex gap-2">
-                      <Icon name="x_mark" class="mt-0.5 size-4 shrink-0 text-terracotta-600" />
+                      <Icon name="x_mark" class="mt-0.5 size-4 shrink-0 text-moss-600" />
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
-            <p class="mt-4 text-sm text-bark-700">
+            <p class="mt-4 text-sm text-ink-700">
               Every itinerary can be tailored. Change the pace, lodges, or add a beach extension.
             </p>
           </section>

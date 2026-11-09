@@ -38,16 +38,16 @@ const platforms = [
           href={p.href}
           target="_blank"
           rel="noopener"
-          class="group flex items-center gap-5 rounded-2xl bg-white p-6 ring-1 ring-sand-200 transition hover:ring-ochre-500"
+          class="group flex items-center gap-5 rounded-2xl bg-white p-6 ring-1 ring-mist-200 transition hover:ring-reed-500"
         >
-          <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-acacia-700 text-white">
+          <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-moss-700 text-white">
             <Icon name={p.icon} class="size-7" />
           </span>
           <span>
             <span class="block font-display text-xl font-semibold">Read our reviews on {p.name}</span>
-            <span class="mt-1 block text-sm text-bark-700">{p.text}</span>
+            <span class="mt-1 block text-sm text-ink-700">{p.text}</span>
           </span>
-          <Icon name="arrow" class="ml-auto size-5 shrink-0 text-terracotta-700 transition group-hover:translate-x-1" />
+          <Icon name="arrow" class="ml-auto size-5 shrink-0 text-moss-700 transition group-hover:translate-x-1" />
         </a>
       ))
     }
@@ -60,16 +60,16 @@ const platforms = [
         <ul class="mt-6 grid gap-6 md:grid-cols-2">
           {reviews.map((r) => (
             <li>
-              <figure class="h-full rounded-2xl bg-white p-6 ring-1 ring-sand-200">
+              <figure class="h-full rounded-2xl bg-white p-6 ring-1 ring-mist-200">
                 {r.data.rating && (
-                  <p class="text-ochre-600" aria-label={`${r.data.rating} out of 5`}>
+                  <p class="text-reed-500" aria-label={`${r.data.rating} out of 5`}>
                     {'★'.repeat(r.data.rating)}
-                    <span class="text-sand-300">{'★'.repeat(5 - r.data.rating)}</span>
+                    <span class="text-mist-300">{'★'.repeat(5 - r.data.rating)}</span>
                   </p>
                 )}
-                <blockquote class="mt-3 font-display text-lg leading-relaxed text-bark-900">“{r.data.quote}”</blockquote>
-                <figcaption class="mt-4 text-sm text-bark-700">
-                  <span class="font-semibold text-bark-900">{r.data.author}</span>
+                <blockquote class="mt-3 font-display text-lg leading-relaxed text-ink-900">“{r.data.quote}”</blockquote>
+                <figcaption class="mt-4 text-sm text-ink-700">
+                  <span class="font-semibold text-ink-900">{r.data.author}</span>
                   {r.data.country && <>, {r.data.country}</>}
                   {r.data.tour && tourTitles.get(r.data.tour.id) && (
                     <> · <a href={`/tours/${r.data.tour.id}`} class="underline underline-offset-2">{tourTitles.get(r.data.tour.id)}</a></>
@@ -87,12 +87,12 @@ const platforms = [
   }
 
   <section class="container-page mt-16">
-    <div class="rounded-3xl bg-sand-100 px-6 py-10 text-center sm:px-12">
+    <div class="rounded-3xl bg-mist-100 px-6 py-10 text-center sm:px-12">
       <h2 class="text-2xl font-semibold sm:text-3xl">Travelled with us?</h2>
-      <p class="mx-auto mt-2 max-w-lg text-bark-700">A short review helps other travellers find us. Thank you!</p>
+      <p class="mx-auto mt-2 max-w-lg text-ink-700">A short review helps other travellers find us. Thank you!</p>
       <div class="mt-6 flex flex-wrap justify-center gap-3">
         <a href={SOCIAL.tripadvisor} target="_blank" rel="noopener" class="btn-primary">Review on Tripadvisor</a>
-        <a href={SOCIAL.safaribookings} target="_blank" rel="noopener" class="btn border border-terracotta-700 text-terracotta-700 hover:bg-terracotta-700/5">Review on SafariBookings</a>
+        <a href={SOCIAL.safaribookings} target="_blank" rel="noopener" class="btn border border-moss-700 text-moss-700 hover:bg-moss-700/5">Review on SafariBookings</a>
       </div>
     </div>
   </section>

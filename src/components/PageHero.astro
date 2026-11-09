@@ -16,7 +16,7 @@ const { title, eyebrow, lead, image, imageAlt = '' } = Astro.props;
 
 {
   image ? (
-    <section class="relative isolate overflow-hidden bg-bark-900">
+    <section class="relative isolate overflow-hidden bg-ink-900">
       <Image
         src={image}
         alt={imageAlt}
@@ -26,21 +26,21 @@ const { title, eyebrow, lead, image, imageAlt = '' } = Astro.props;
         fetchpriority="high"
         class="absolute inset-0 -z-10 size-full object-cover"
       />
-      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-bark-900/90 via-bark-900/50 to-bark-900/20" />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-900/90 via-ink-900/50 to-ink-900/20" />
       <div class="container-page flex min-h-[24rem] flex-col justify-end pt-12 pb-16 sm:min-h-[30rem] sm:pb-20">
-        {eyebrow && <p class="font-hand text-2xl text-ochre-300 sm:text-3xl">{eyebrow}</p>}
+        {eyebrow && <p class="font-hand text-2xl text-reed-300 sm:text-3xl">{eyebrow}</p>}
         <h1 class="mt-2 max-w-3xl text-4xl text-white uppercase sm:text-6xl">{title}</h1>
-        {lead && <p class="mt-4 max-w-2xl text-base text-sand-100 sm:text-lg">{lead}</p>}
+        {lead && <p class="mt-4 max-w-2xl text-base text-mist-100 sm:text-lg">{lead}</p>}
         <slot />
       </div>
       <TornEdge />
     </section>
   ) : (
-    <section class="relative bg-sand-100">
+    <section class="relative bg-mist-300">
       <div class="container-page pt-12 pb-16 sm:pt-16 sm:pb-20">
         {eyebrow && <p class="eyebrow">{eyebrow}</p>}
         <h1 class="mt-2 max-w-3xl text-4xl uppercase sm:text-6xl">{title}</h1>
-        {lead && <p class="mt-4 max-w-2xl text-base text-bark-700 sm:text-lg">{lead}</p>}
+        {lead && <p class="mt-4 max-w-2xl text-base text-ink-700 sm:text-lg">{lead}</p>}
         <slot />
       </div>
       <TornEdge />

@@ -3,38 +3,35 @@
 @import '@fontsource/nothing-you-could-do';
 @import 'tailwindcss';
 
-/* Earthy safari palette.
-   Text-safe pairings: bark-900 on sand-50; white on terracotta-700 / acacia-700 / bark-900;
-   bark-900 on ochre-400. Avoid ochre-500 for small text on light backgrounds. */
 @theme {
   --font-sans: 'Commissioner Variable', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Marcellus', ui-serif, Georgia, serif;
   --font-hand: 'Nothing You Could Do', cursive;
 
-  --color-sand-50: #fbf7f0;
-  --color-sand-100: #f4ecdd;
-  --color-sand-200: #e8d9bd;
-  --color-sand-300: #d8c199;
+  /* Backgrounds sampled from the reference designs (Poveda, Altai) */
+  --color-mist-50: #f2f4f3;
+  --color-mist-100: #e6ebe9;
+  --color-mist-200: #dce0df;
+  --color-mist-300: #c8cdc9;
+  --color-mist-400: #b5bab6;
 
-  --color-ochre-300: #e8b86a;
-  --color-ochre-400: #dca04a;
-  --color-ochre-500: #c8862f;
-  --color-ochre-600: #a96c1f;
-  --color-ochre-700: #85541a;
+  /* Dark olive family, from the Poveda footer band */
+  --color-moss-500: #676d5f;
+  --color-moss-600: #5a6452;
+  --color-moss-700: #485342;
+  --color-moss-800: #3a4335;
+  --color-moss-900: #2c3329;
 
-  --color-terracotta-500: #c0603d;
-  --color-terracotta-600: #a8472b;
-  --color-terracotta-700: #8a3a23;
+  /* Text */
+  --color-ink-600: #5c625b;
+  --color-ink-700: #474c46;
+  --color-ink-800: #343832;
+  --color-ink-900: #232622;
 
-  --color-acacia-500: #78864c;
-  --color-acacia-600: #5d6b3a;
-  --color-acacia-700: #4a552e;
-  --color-acacia-800: #3a4325;
-
-  --color-bark-600: #6e5641;
-  --color-bark-700: #574332;
-  --color-bark-800: #3d2f22;
-  --color-bark-900: #2b2118;
+  /* Small accent: dry reed. reed-700 for text on light, reed-300 on dark. */
+  --color-reed-300: #d8cba8;
+  --color-reed-500: #a08c5b;
+  --color-reed-700: #6f6038;
 
   --color-whatsapp: #1f8f4e;
 }
@@ -48,7 +45,7 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-sand-50 font-sans text-bark-900 antialiased;
+    @apply bg-mist-50 font-sans text-ink-900 antialiased;
   }
   h1,
   h2,
@@ -66,7 +63,7 @@
     letter-spacing: 0.01em;
   }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ochre-600;
+    @apply outline-2 outline-offset-2 outline-reed-500;
   }
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -82,34 +79,34 @@
   @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
 }
 @utility btn-primary {
-  @apply btn bg-terracotta-700 text-white hover:bg-terracotta-600;
+  @apply btn bg-moss-700 text-white hover:bg-moss-600;
 }
 @utility btn-accent {
-  @apply btn bg-ochre-400 text-bark-900 hover:bg-ochre-300;
+  @apply btn bg-reed-300 text-ink-900 hover:bg-reed-300;
 }
 @utility btn-outline {
   @apply btn border border-current hover:bg-white/10;
 }
 /* Handwritten accent above headings */
 @utility eyebrow {
-  @apply font-hand text-2xl leading-tight text-ochre-700 sm:text-3xl;
+  @apply font-hand text-2xl leading-tight text-reed-700 sm:text-3xl;
 }
 /* Long-form copy from the content collections */
 @utility prose-safari {
-  @apply max-w-none text-base leading-relaxed text-bark-800;
+  @apply max-w-none text-base leading-relaxed text-ink-800;
   & > * + * {
     @apply mt-4;
   }
   & h2 {
-    @apply mt-10 text-2xl font-semibold text-bark-900;
+    @apply mt-10 text-2xl font-semibold text-ink-900;
   }
   & h3 {
-    @apply mt-8 text-xl font-semibold text-bark-900;
+    @apply mt-8 text-xl font-semibold text-ink-900;
   }
   & ul {
     @apply list-disc space-y-1 pl-5;
   }
   & a {
-    @apply font-medium text-terracotta-700 underline underline-offset-2 hover:text-terracotta-600;
+    @apply font-medium text-moss-700 underline underline-offset-2 hover:text-moss-600;
   }
 }

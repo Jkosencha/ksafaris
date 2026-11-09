@@ -8,16 +8,16 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
 
-<header class="sticky top-0 z-40 border-b border-sand-200 bg-sand-50/95 backdrop-blur">
-  <div class="hidden bg-bark-900 text-sand-100 sm:block">
+<header class="sticky top-0 z-40 border-b border-mist-200 bg-mist-50/95 backdrop-blur">
+  <div class="hidden bg-moss-700 text-mist-100 sm:block">
     <div class="container-page flex h-9 items-center justify-between text-xs">
       <p class="font-hand text-base">{SITE.motto}</p>
       <div class="flex items-center gap-5">
-        <a href={`mailto:${CONTACT.email}`} class="inline-flex items-center gap-1.5 hover:text-ochre-300">
+        <a href={`mailto:${CONTACT.email}`} class="inline-flex items-center gap-1.5 hover:text-reed-300">
           <Icon name="mail" class="size-3.5" />
           {CONTACT.email}
         </a>
-        <a href={`tel:${CONTACT.phoneE164}`} class="inline-flex items-center gap-1.5 hover:text-ochre-300">
+        <a href={`tel:${CONTACT.phoneE164}`} class="inline-flex items-center gap-1.5 hover:text-reed-300">
           <Icon name="phone" class="size-3.5" />
           {CONTACT.phoneDisplay}
         </a>
@@ -38,7 +38,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
               <a
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                class="rounded-full px-3 py-2 text-sm font-medium text-bark-800 hover:bg-sand-100 aria-[current=page]:text-terracotta-700"
+                class="rounded-full px-3 py-2 text-sm font-medium text-ink-800 hover:bg-mist-100 aria-[current=page]:text-moss-700"
               >
                 {item.label}
               </a>
@@ -52,7 +52,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
       <a href="/contact#plan" class="btn-primary hidden sm:inline-flex">Plan my safari</a>
       <button
         type="button"
-        class="inline-flex size-11 items-center justify-center rounded-full text-bark-900 hover:bg-sand-100 lg:hidden"
+        class="inline-flex size-11 items-center justify-center rounded-full text-ink-900 hover:bg-mist-100 lg:hidden"
         aria-controls="mobile-nav"
         aria-expanded="false"
         data-menu-toggle
@@ -63,7 +63,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
     </div>
   </div>
 
-  <nav id="mobile-nav" aria-label="Main" class="hidden border-t border-sand-200 bg-sand-50 lg:hidden" data-menu>
+  <nav id="mobile-nav" aria-label="Main" class="hidden border-t border-mist-200 bg-mist-50 lg:hidden" data-menu>
     <ul class="container-page flex flex-col py-2">
       <li>
         <a href="/" class="block py-3 text-base font-medium" aria-current={path === '/' ? 'page' : undefined}>Home</a>
@@ -74,7 +74,7 @@ const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
             <a
               href={item.href}
               aria-current={isActive(item.href) ? 'page' : undefined}
-              class="block border-t border-sand-200 py-3 text-base font-medium aria-[current=page]:text-terracotta-700"
+              class="block border-t border-mist-200 py-3 text-base font-medium aria-[current=page]:text-moss-700"
             >
               {item.label}
             </a>
