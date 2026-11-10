@@ -8,6 +8,7 @@ import EnquiryForm from '../../components/EnquiryForm.astro';
 import TourCard from '../../components/TourCard.astro';
 import Icon from '../../components/Icon.astro';
 import PhotoBand from '../../components/PhotoBand.astro';
+import RouteMap from '../../components/RouteMap.astro';
 import { formatPrice, paragraphs } from '../../lib/format';
 import { touristTrip } from '../../lib/schema';
 
@@ -21,7 +22,7 @@ interface Props {
 }
 
 const { tour } = Astro.props;
-const { title, summary, durationDays, route, priceFrom, heroImage, heroAlt, itinerary, included, excluded } = tour.data;
+const { title, summary, durationDays, route, flyTo, priceFrom, heroImage, heroAlt, itinerary, included, excluded } = tour.data;
 const destinations = await getEntries(tour.data.destinations);
 
 const others = (await getCollection('tours'))
@@ -78,17 +79,9 @@ const facts = [
 
       {
         route.length > 0 && (
-          <div class="mt-6">
-            <h2 class="sr-only">Route</h2>
-            <ol class="flex flex-wrap items-center gap-2 text-sm">
-              {route.map((stop, i) => (
-                <li class="flex items-center gap-2">
-                  {i > 0 && <span aria-hidden="true" class="text-reed-500">→</span>}
-                  <span class="rounded-full bg-moss-700/10 px-3 py-1 font-medium text-moss-800">{stop}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
+          <section aria-label="Route map" class="mt-8">
+            <RouteMap route={route} flyTo={flyTo} countries={destinations.map((d) => d.data.name)} />
+          </section>
         )
       }
 

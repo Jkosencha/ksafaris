@@ -48,6 +48,8 @@ const tours = defineCollection({
       destinations: z.array(reference('destinations')).min(1),
       /** Stops along the route, in order (parks, lakes, towns). */
       route: z.array(z.string()).default([]),
+      /** Route stops reached by light aircraft (drawn dashed on the map). */
+      flyTo: z.array(z.string()).default([]),
       /** Lowest per-person price in USD. Leave out to show "Price on request". */
       priceFrom: z.number().positive().optional(),
       heroImage: image(),

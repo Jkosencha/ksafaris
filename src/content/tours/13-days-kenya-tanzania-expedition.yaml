@@ -12,6 +12,12 @@ route:
   - Central Serengeti (Seronera)
   - Ngorongoro Crater
   - Lake Manyara
+flyTo:
+  - Chyulu Hills
+  - Maasai Mara
+  - Northern Serengeti (Kogatende)
+  - Central Serengeti (Seronera)
+  - Ngorongoro Crater
 heroImage: ../../assets/images/placeholders/ngorongoro-nature.jpg
 heroAlt: An elephant crossing a dirt track in front of safari vehicles on the floor of the Ngorongoro Crater
 featured: true

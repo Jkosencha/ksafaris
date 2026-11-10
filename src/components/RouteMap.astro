@@ -1,0 +1,174 @@
+---
+/**
+ * Drawn map of a tour's route: numbered stops joined by road (solid) or flight (dashed) legs,
+ * with a matching numbered list. Stops missing from PLACES are listed but not drawn.
+ */
+import { COUNTRIES, LAKES, MAP_BOUNDS as B } from '../data/east-africa-map';
+import { PLACES } from '../data/places';
+
+interface Props {
+  route: string[];
+  /** Stops reached by air. */
+  flyTo?: string[];
+  /** Countries to highlight, by Natural Earth name (e.g. "Kenya"). */
+  countries?: string[];
+}
+
+const { route, flyTo = [], countries = [] } = Astro.props;
+
+const project = ([lon, lat]: [number, number]) => [(lon - B.west) * B.scale, (B.north - lat) * B.scale] as const;
+const stops = route.map((name, i) => ({
+  name,
+  n: i + 1,
+  fly: i > 0 && flyTo.includes(name),
+  at: PLACES[name] ? project(PLACES[name]) : null,
+}));
+const drawn = stops.filter((s) => s.at);
+
+// Frame the stops with some breathing room, at a fixed 5:4 shape and a sensible minimum zoom.
+const xs = drawn.map((s) => s.at![0]);
+const ys = drawn.map((s) => s.at![1]);
+const pad = 0.9 * B.scale;
+let w = Math.max(Math.max(...xs) - Math.min(...xs) + pad * 2, 4.5 * B.scale);
+let h = Math.max(Math.max(...ys) - Math.min(...ys) + pad * 2, 3.6 * B.scale);
+if (w / h > 5 / 4) h = (w * 4) / 5;
+else w = (h * 5) / 4;
+const cx = (Math.max(...xs) + Math.min(...xs)) / 2;
+const cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+const box = { x: cx - w / 2, y: cy - h / 2, w, h };
+const u = w / 600; // one on-screen pixel at 600px wide, so text and lines keep their size at any zoom
+
+// Gently curved legs; flights arc a little more.
+const legs = drawn.slice(1).map((s, i) => {
+  const [x1, y1] = drawn[i].at!;
+  const [x2, y2] = s.at!;
+  const bend = s.fly ? 0.22 : 0.08;
+  const qx = (x1 + x2) / 2 - (y2 - y1) * bend;
+  const qy = (y1 + y2) / 2 + (x2 - x1) * bend;
+  return { d: `M${x1},${y1} Q${qx},${qy} ${x2},${y2}`, fly: s.fly };
+});
+
+// Hand-lettered labels: each tries a few spots and takes the first inside the frame and clear of the stops.
+const labels: { text: string; at: [number, number][]; peak?: boolean }[] = [
+  { text: 'Kenya', at: [[38.4, 1.4], [37.9, -0.4], [36.4, 0.4], [38.6, -1.6], [35.6, -0.2], [38.0, -1.3], [36.1, -0.9]] },
+  { text: 'Tanzania', at: [[35.0, -5.6], [36.6, -4.6], [34.4, -4.4], [37.8, -5.0], [36.8, -3.9], [34.4, -3.6], [34.0, -3.2]] },
+  { text: 'Uganda', at: [[32.4, 1.6], [33.6, 1.0]] },
+  { text: 'Lake Victoria', at: [[32.9, -1.0], [33.6, -0.9], [33.2, -2.0]] },
+  { text: 'Indian Ocean', at: [[41.0, -5.2], [40.6, -3.4], [41.0, -2.4]] },
+  { text: 'Kilimanjaro', at: [[37.36, -3.07]], peak: true },
+];
+const margin = 45 * u;
+const fits = ([x, y]: readonly [number, number]) =>
+  x > box.x + margin && x < box.x + box.w - margin && y > box.y + 20 * u && y < box.y + box.h - 20 * u &&
+  drawn.every((s) => Math.hypot(s.at![0] - x, s.at![1] - y) > 40 * u);
+const shownLabels = labels.flatMap((l) => {
+  const xy = l.at.map((a) => project(a)).find(fits);
+  return xy ? [{ ...l, xy }] : [];
+});
+const hasFlights = stops.some((s) => s.fly);
+---
+
+<figure class="grid gap-6 rounded-md bg-white p-4 ring-1 ring-mist-200 sm:grid-cols-[minmax(0,1fr)_14rem] sm:p-5">
+  <svg
+    viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`}
+    class="block w-full rounded-sm"
+    role="img"
+    aria-label={`Map of the route: ${route.join(', then ')}`}
+  >
+    <rect x={box.x} y={box.y} width={box.w} height={box.h} fill="#b3c2c0" />
+    {
+      COUNTRIES.map((c) => (
+        <path
+          d={c.d}
+          fill={countries.includes(c.name) ? '#f7f6f2' : '#e1e4df'}
+          stroke="#a9afa9"
+          stroke-width={1.2 * u}
+          stroke-linejoin="round"
+        />
+      ))
+    }
+    {LAKES.map((l) => <path d={l.d} fill="#b3c2c0" stroke="#a3b1af" stroke-width={0.6 * u} />)}
+
+    {
+      shownLabels.map((l) =>
+        l.peak ? (
+          <g class="text-ink-600" fill="currentColor">
+            <path d={`M${l.xy[0] - 7 * u},${l.xy[1] + 5 * u} L${l.xy[0]},${l.xy[1] - 6 * u} L${l.xy[0] + 7 * u},${l.xy[1] + 5 * u}Z`} />
+            <text x={l.xy[0] + 10 * u} y={l.xy[1] + 4 * u} font-size={13 * u} class="font-sans">
+              {l.text}
+            </text>
+          </g>
+        ) : (
+          <text x={l.xy[0]} y={l.xy[1]} text-anchor="middle" font-size={22 * u} class="font-hand" fill="#6f6038" opacity="0.8">
+            {l.text}
+          </text>
+        ),
+      )
+    }
+
+    {
+      legs.map((l) => (
+        <path
+          d={l.d}
+          fill="none"
+          stroke={l.fly ? '#a08c5b' : '#485342'}
+          stroke-width={(l.fly ? 2.2 : 3) * u}
+          stroke-dasharray={l.fly ? `${7 * u} ${6 * u}` : undefined}
+          stroke-linecap="round"
+        />
+      ))
+    }
+
+    {
+      drawn.map((s) => (
+        <g>
+          <circle cx={s.at![0]} cy={s.at![1]} r={12 * u} fill="#485342" stroke="#fff" stroke-width={2 * u} />
+          <text
+            x={s.at![0]}
+            y={s.at![1] + 4 * u}
+            text-anchor="middle"
+            font-size={12 * u}
+            font-weight="700"
+            fill="#fff"
+            class="font-sans"
+          >
+            {s.n}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+
+  <figcaption>
+    <p class="font-display text-xl uppercase">Your route</p>
+    <ol class="mt-3 space-y-2 text-sm">
+      {
+        stops.map((s) => (
+          <li class="flex items-center gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-moss-700 text-[0.7rem] font-bold text-white">
+              {s.n}
+            </span>
+            <span class="text-ink-800">
+              {s.name}
+              {s.fly && <span class="ml-1 text-xs text-reed-700">(fly in)</span>}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+    <dl class="mt-5 space-y-1.5 border-t border-mist-200 pt-4 text-xs text-ink-700">
+      <div class="flex items-center gap-2">
+        <dt><svg viewBox="0 0 28 4" class="h-1 w-7" aria-hidden="true"><line x1="1" y1="2" x2="27" y2="2" stroke="#485342" stroke-width="3" stroke-linecap="round" /></svg></dt>
+        <dd>By road</dd>
+      </div>
+      {
+        hasFlights && (
+          <div class="flex items-center gap-2">
+            <dt><svg viewBox="0 0 28 4" class="h-1 w-7" aria-hidden="true"><line x1="1" y1="2" x2="27" y2="2" stroke="#a08c5b" stroke-width="2.2" stroke-dasharray="6 4" stroke-linecap="round" /></svg></dt>
+            <dd>By light aircraft</dd>
+          </div>
+        )
+      }
+    </dl>
+  </figcaption>
+</figure>

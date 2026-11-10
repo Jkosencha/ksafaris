@@ -10,6 +10,8 @@ route:
   - Lake Nakuru
   - Maasai Mara
   - Mombasa
+flyTo:
+  - Mombasa
 heroImage: ../../assets/images/placeholders/nakuru-flamingos.jpg
 heroAlt: Thousands of pink flamingos wading in Lake Nakuru below the forested Rift Valley escarpment
 featured: true
