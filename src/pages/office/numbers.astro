@@ -1,0 +1,196 @@
+---
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import PhotoStat from '../../components/office/PhotoStat.astro';
+import { MONTHS, RANKINGS } from '../../data/office-sample';
+
+const sum = (key: 'enquiries' | 'bookings' | 'revenue') => MONTHS.reduce((s, m) => s + m[key], 0);
+const enquiries = sum('enquiries');
+const bookings = sum('bookings');
+const revenue = sum('revenue');
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+const pct = (a: number, b: number) => `${Math.round((a / b) * 100)}%`;
+
+// Single y-scale per chart, with clean ticks.
+const COUNT_MAX = 60;
+const REV_MAX = 60000;
+const peak = MONTHS.reduce((a, b) => (b.enquiries > a.enquiries ? b : a));
+const latest = MONTHS.at(-1)!;
+const periods = ['This month', '3 months', '12 months', 'This year'];
+const card = 'flex flex-col gap-4 rounded-xl bg-o-surface p-5 sm:p-6';
+const sub = 'mt-1 text-[13px] text-o-muted';
+---
+
+<OfficeLayout title="Numbers">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-[34px] uppercase">Numbers</h1>
+      <p class="mt-1.5 text-[15px] text-o-muted">How the business is doing: enquiries, bookings, money and where guests come from.</p>
+    </div>
+    <div role="group" aria-label="Time period" class="flex flex-wrap gap-1.5 rounded-full bg-o-surface p-1">
+      {
+        periods.map((p) => (
+          <button
+            type="button"
+            aria-pressed={p === '12 months' ? 'true' : 'false'}
+            class="min-h-10 rounded-full px-4 text-sm font-semibold text-o-soft aria-pressed:bg-teal aria-pressed:text-[#0e1d1e]"
+          >
+            {p}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <section aria-label="Headline numbers" class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <PhotoStat size="lg" class="md:col-span-2" label="Revenue confirmed, last 12 months" value={usd(revenue)} note="↑ 18% on the 12 months before" tone="leaf" photo="mara" />
+    <PhotoStat label="Enquiries" value={enquiries.toLocaleString('en-US')} note="Website, WhatsApp and partners" tone="teal" photo="flamingos" />
+    <PhotoStat label="Bookings confirmed" value={String(bookings)} note={`${pct(bookings, enquiries)} of enquiries booked`} tone="gold" photo="lion" />
+  </section>
+
+  <section aria-labelledby="eb" class={card}>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 id="eb" class="font-display text-xl">Enquiries and bookings per month</h2>
+        <p class={sub}>{MONTHS[0].full} to {latest.full} · point at a bar for the exact number</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <ul aria-label="Legend" class="flex gap-4 text-[13px] text-o-soft">
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="size-3 rounded-sm bg-chart-a"></span>Enquiries</li>
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="size-3 rounded-sm bg-chart-b"></span>Bookings</li>
+        </ul>
+        <button type="button" data-table-toggle aria-pressed="false" class="min-h-10 rounded-full bg-o-surface2 px-3.5 text-[13px] font-semibold">Show as table</button>
+      </div>
+    </div>
+
+    <div data-chart class="flex gap-2.5">
+      <div aria-hidden="true" class="flex h-60 -translate-y-1.5 flex-col justify-between text-right text-xs text-o-muted tabular-nums">
+        <span>60</span><span>40</span><span>20</span><span>0</span>
+      </div>
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div
+          role="img"
+          aria-label={`Column chart. Enquiries peaked at ${peak.enquiries} in ${peak.full}; ${enquiries} enquiries and ${bookings} bookings over 12 months. Use Show as table for every value.`}
+          class="flex h-60 items-end justify-around border-b border-o-line2 bg-[linear-gradient(var(--o-line)_1px,transparent_1px)] bg-size-[100%_80px]"
+        >
+          {
+            MONTHS.map((m) => (
+              <div class="relative flex h-full items-end gap-0.5">
+                {m === peak && (
+                  <span class="absolute left-0 text-xs font-bold text-o-text" style={`bottom: calc(${(m.enquiries / COUNT_MAX) * 100}% + 4px)`}>
+                    {m.enquiries}
+                  </span>
+                )}
+                <span title={`${m.full}: ${m.enquiries} enquiries`} class="w-4.5 rounded-t bg-chart-a" style={`height: ${(m.enquiries / COUNT_MAX) * 100}%`} />
+                <span title={`${m.full}: ${m.bookings} bookings`} class="w-4.5 rounded-t bg-chart-b" style={`height: ${(m.bookings / COUNT_MAX) * 100}%`} />
+              </div>
+            ))
+          }
+        </div>
+        <div aria-hidden="true" class="flex justify-around text-xs text-o-muted">
+          {MONTHS.map((m) => <span class="w-9.5 text-center">{m.short}</span>)}
+        </div>
+      </div>
+    </div>
+
+    <div data-table hidden class="overflow-x-auto">
+      <table class="w-full min-w-[520px] text-sm tabular-nums">
+        <caption class="sr-only">Enquiries, bookings and revenue per month</caption>
+        <thead>
+          <tr class="text-left text-xs tracking-wider text-o-muted uppercase">
+            <th class="p-2">Month</th><th class="p-2 text-right">Enquiries</th><th class="p-2 text-right">Bookings</th><th class="p-2 text-right">Booked</th><th class="p-2 text-right">Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            MONTHS.map((m, i) => (
+              <tr class:list={[i % 2 === 0 && 'bg-o-surface2']}>
+                <th scope="row" class="p-2 text-left font-normal">{m.full}</th>
+                <td class="p-2 text-right">{m.enquiries}</td>
+                <td class="p-2 text-right">{m.bookings}</td>
+                <td class="p-2 text-right">{pct(m.bookings, m.enquiries)}</td>
+                <td class="p-2 text-right">{usd(m.revenue)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section aria-labelledby="rev" class={card}>
+      <div>
+        <h2 id="rev" class="font-display text-xl">Revenue confirmed per month</h2>
+        <p class={sub}>US dollars, by the month the booking was confirmed</p>
+      </div>
+      <div class="flex gap-2.5">
+        <div aria-hidden="true" class="flex h-50 -translate-y-1.5 flex-col justify-between text-right text-xs text-o-muted tabular-nums">
+          <span>60K</span><span>40K</span><span>20K</span><span>0</span>
+        </div>
+        <div class="flex min-w-0 flex-1 flex-col gap-2">
+          <div
+            role="img"
+            aria-label={`Column chart of monthly revenue, ${usd(latest.revenue)} in ${latest.full}`}
+            class="flex h-50 items-end justify-around border-b border-o-line2 bg-[linear-gradient(var(--o-line)_1px,transparent_1px)] bg-size-[100%_66.67px]"
+          >
+            {
+              MONTHS.map((m) => (
+                <div class="relative flex h-full items-end">
+                  {m === latest && (
+                    <span class="absolute right-0 text-xs font-bold whitespace-nowrap text-o-text" style={`bottom: calc(${(m.revenue / REV_MAX) * 100}% + 4px)`}>
+                      ${(m.revenue / 1000).toFixed(1)}K
+                    </span>
+                  )}
+                  <span title={`${m.full}: ${usd(m.revenue)}`} class="w-5 rounded-t bg-chart-a" style={`height: ${(m.revenue / REV_MAX) * 100}%`} />
+                </div>
+              ))
+            }
+          </div>
+          <div aria-hidden="true" class="flex justify-around text-xs text-o-muted">
+            {MONTHS.map((m) => <span class="w-5 text-center">{m.short.charAt(0)}</span>)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {
+      RANKINGS.map((r) => {
+        const max = Math.max(...r.rows.map(([, v]) => v));
+        const total = r.rows.reduce((s, [, v]) => s + v, 0);
+        return (
+          <section class={card}>
+            <div>
+              <h2 class="font-display text-xl">{r.title}</h2>
+              <p class={sub}>{r.sub} · {total} in all</p>
+            </div>
+            <ul class="flex flex-col gap-3">
+              {r.rows.map(([name, v]) => (
+                <li title={`${name}: ${v} (${pct(v, total)})`} class="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-3 text-sm">
+                  <span class="text-o-soft">{name}</span>
+                  <span class="flex items-center gap-2">
+                    <span class="block h-5 rounded-r bg-chart-a" style={`width: ${(v / max) * 82}%`} />
+                    <span class="font-bold tabular-nums">{v}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })
+    }
+  </div>
+</OfficeLayout>
+
+<script>
+  // Swap the monthly chart for a table of exact numbers, and back.
+  const button = document.querySelector<HTMLButtonElement>('[data-table-toggle]')!;
+  const chart = document.querySelector<HTMLElement>('[data-chart]')!;
+  const table = document.querySelector<HTMLElement>('[data-table]')!;
+  button.addEventListener('click', () => {
+    const showTable = table.hidden;
+    table.hidden = !showTable;
+    chart.hidden = showTable;
+    button.setAttribute('aria-pressed', String(showTable));
+    button.textContent = showTable ? 'Show chart' : 'Show as table';
+  });
+</script>

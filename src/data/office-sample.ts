@@ -198,3 +198,25 @@ export const GUEST_PROFILE = {
     { tour: 'Amboseli & Tsavo', when: 'Mar 2023 · 2 guests', status: 'Completed', tone: 'leaf' as Tone, photo: 'lion' as PhotoKey },
   ],
 };
+
+/** Twelve months, December 2025 to November 2026 (November so far). */
+export const MONTHS = [
+  { short: 'Dec', full: 'December 2025', enquiries: 28, bookings: 8, revenue: 24100 },
+  { short: 'Jan', full: 'January 2026', enquiries: 32, bookings: 9, revenue: 27000 },
+  { short: 'Feb', full: 'February 2026', enquiries: 41, bookings: 12, revenue: 35800 },
+  { short: 'Mar', full: 'March 2026', enquiries: 38, bookings: 11, revenue: 33000 },
+  { short: 'Apr', full: 'April 2026', enquiries: 35, bookings: 10, revenue: 29500 },
+  { short: 'May', full: 'May 2026', enquiries: 30, bookings: 8, revenue: 22800 },
+  { short: 'Jun', full: 'June 2026', enquiries: 44, bookings: 13, revenue: 38600 },
+  { short: 'Jul', full: 'July 2026', enquiries: 52, bookings: 16, revenue: 47200 },
+  { short: 'Aug', full: 'August 2026', enquiries: 48, bookings: 14, revenue: 41000 },
+  { short: 'Sep', full: 'September 2026', enquiries: 46, bookings: 13, revenue: 37900 },
+  { short: 'Oct', full: 'October 2026', enquiries: 49, bookings: 15, revenue: 44300 },
+  { short: 'Nov', full: 'November 2026 (so far)', enquiries: 43, bookings: 9, revenue: 48200 },
+];
+
+export const RANKINGS: { title: string; sub: string; rows: [string, number][] }[] = [
+  { title: 'Where enquiries come from', sub: 'All enquiries, last 12 months', rows: [['Website form', 212], ['WhatsApp', 118], ['Tripadvisor', 64], ['SafariBookings', 41], ['Friends and family', 33], ['Facebook / Instagram', 18]] },
+  { title: 'Most booked', sub: 'Bookings, last 12 months', rows: [['Tailor-made safaris', 54], ['17 Days Best of Kenya', 34], ['10 Days Bush & Beach', 29], ['13 Days Kenya Tanzania', 21]] },
+  { title: 'Where guests live', sub: 'Lead guest’s country', rows: [['United Kingdom', 31], ['United States', 27], ['Germany', 18], ['Kenya', 16], ['Canada', 11], ['Netherlands', 9], ['Other countries', 26]] },
+];
