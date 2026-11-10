@@ -76,3 +76,18 @@ export const WEBSITE_COUNTS = [
   { label: 'Reviews', value: '6 samples' },
   { label: 'Photos', value: '48' },
 ];
+
+export const TODOS: { text: string; meta: string; tone?: Tone; href?: string }[] = [
+  { text: 'Reply to Sarah Mitchell', meta: 'Booking request · 25 min ago', tone: 'teal', href: '/office/bookings/KS-2611-0142' },
+  { text: 'Send quote to Daniel Roy', meta: 'Check Serengeti camp space for March', href: '/office/bookings/KS-2611-0141' },
+  { text: 'Chase deposit: Okoro family', meta: 'Invoice sent 3 days ago', tone: 'clay', href: '/office/bookings/KS-2611-0131' },
+  { text: 'Assign a guide to the Price family', meta: 'Departs 12 Dec', href: '/office/trips' },
+  { text: 'Approve new Tripadvisor review', meta: 'Website › Reviews', href: '/office/website' },
+];
+
+export const MONTH_SUMMARY = [
+  { value: '9', label: 'Bookings confirmed' },
+  { value: '$48.2k', label: 'Value confirmed' },
+  { value: '21%', label: 'Enquiries that booked' },
+  { value: '3 h', label: 'Average first reply' },
+];

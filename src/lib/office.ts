@@ -23,6 +23,14 @@ export const TONE: Record<Tone, { chip: string; card: string; solid: string; was
   leaf: { chip: 'bg-leaf-soft text-leaf-ink', card: 'bg-leaf-soft text-leaf-ink', solid: 'bg-leaf text-[#10170d]', wash: 'bg-leaf-wash' },
 };
 
+/** Text in the dark shade of a meaning colour, for use on the page background. */
+export const INK: Record<Tone, string> = {
+  teal: 'text-teal-ink',
+  gold: 'text-gold-ink',
+  clay: 'text-clay-ink',
+  leaf: 'text-leaf-ink',
+};
+
 export const OFFICE_NAV = [
   { href: '/office', label: 'Overview' },
   { href: '/office/bookings', label: 'Bookings', count: 5 },
