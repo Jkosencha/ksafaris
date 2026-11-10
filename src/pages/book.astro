@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import BookingForm from '../components/BookingForm.astro';
+import Icon from '../components/Icon.astro';
+import heroImage from '../assets/images/placeholders/mara-lioness-vehicle.jpg';
+import { CONTACT, whatsappLink } from '../consts';
+
+const description =
+  'Book your safari with KSafaris & African Expeditions. Choose your tour and dates and we will confirm availability within one working day.';
+
+// Placeholder process; update once the client confirms their booking and payment terms.
+const steps = [
+  { title: 'Send your request', text: 'Choose your safari, dates and travellers below.' },
+  { title: 'We confirm', text: 'Within one working day we check availability and send your final price.' },
+  { title: 'Secure your booking', text: 'We send payment details and your booking is confirmed once payment is received.' },
+  { title: 'Get ready', text: 'You receive your final itinerary, vouchers and a pre-travel briefing.' },
+];
+---
+
+<BaseLayout title="Book Your Safari" description={description}>
+  <PageHero
+    image={heroImage}
+    imageAlt="A young lioness in long grass watched by guests in an open-roof safari vehicle"
+    eyebrow="Book now"
+    title="Book your safari"
+    lead="Chosen your safari? Send us your dates and travellers and we’ll confirm everything within one working day."
+  />
+
+  <div class="container-page mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <BookingForm />
+
+    <aside class="space-y-6 lg:sticky lg:top-28 lg:self-start">
+      <div class="rounded-md bg-mist-300 p-6">
+        <h2 class="text-xl">How booking works</h2>
+        <ol class="mt-4 space-y-4">
+          {
+            steps.map((s, i) => (
+              <li class="flex gap-3">
+                <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-moss-700 text-xs font-bold text-white">
+                  {i + 1}
+                </span>
+                <span>
+                  <span class="block font-semibold">{s.title}</span>
+                  <span class="block text-sm text-ink-700">{s.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="rounded-md bg-moss-700 p-6 text-mist-50">
+        <p class="font-hand text-2xl text-reed-300">Still deciding?</p>
+        <p class="mt-1 text-sm text-mist-100">Not sure which safari is right? Tell us your ideas and we’ll suggest one.</p>
+        <a href="/contact#plan" class="btn-accent mt-4 w-full">Plan my safari</a>
+      </div>
+      <div class="space-y-2 text-sm">
+        <a href={whatsappLink('Hello KSafaris, I have a question about booking.')} target="_blank" rel="noopener" class="flex items-center gap-2 text-ink-800 hover:text-moss-700">
+          <Icon name="whatsapp" class="size-4 text-whatsapp" />
+          {CONTACT.phoneDisplay}
+        </a>
+        <a href={`mailto:${CONTACT.email}`} class="flex items-center gap-2 break-all text-ink-800 hover:text-moss-700">
+          <Icon name="mail" class="size-4 shrink-0" />
+          {CONTACT.email}
+        </a>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

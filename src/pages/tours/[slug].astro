@@ -58,7 +58,10 @@ const facts = [
         ))
       }
     </dl>
-    <a href="#plan" class="btn-accent mt-6 self-start">Plan this safari</a>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href={`/book?tour=${tour.id}`} class="btn-accent">Book this safari</a>
+      <a href="#plan" class="btn-outline text-white">Ask a question</a>
+    </div>
   </PageHero>
 
   <nav aria-label="Breadcrumb" class="container-page pt-6 text-sm text-ink-700">
@@ -164,6 +167,7 @@ const facts = [
             <p class="mt-4 text-sm text-ink-700">
               Every itinerary can be tailored. Change the pace, lodges, or add a beach extension.
             </p>
+            <a href={`/book?tour=${tour.id}`} class="btn-primary mt-6">Book this safari</a>
           </section>
         )
       }

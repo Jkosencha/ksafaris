@@ -1,6 +1,7 @@
 ---
 import { CONTACT, whatsappLink } from '../consts';
 import Icon from './Icon.astro';
+import { FORM_ENDPOINT, fieldClass, labelClass } from '../lib/forms';
 
 interface Props {
   /** Tour title, sent with the enquiry when the form is on a tour page. */
@@ -11,18 +12,15 @@ interface Props {
 
 const { tour, id = 'plan', heading = 'Plan my safari' } = Astro.props;
 
-// Set PUBLIC_ENQUIRY_ENDPOINT (e.g. a Formspree / Web3Forms / Netlify function URL) in .env.
-// Without it the form falls back to opening a pre-filled email to the office.
-const endpoint = import.meta.env.PUBLIC_ENQUIRY_ENDPOINT as string | undefined;
+const endpoint = FORM_ENDPOINT;
 const action = endpoint || `mailto:${CONTACT.email}`;
 const subject = tour ? `Safari enquiry: ${tour}` : 'Safari enquiry';
 const waText = tour
   ? `Hello KSafaris, I'm interested in the "${tour}" tour.`
   : 'Hello KSafaris, I would like to plan a safari.';
 
-const field =
-  'mt-1 block w-full rounded-md border border-mist-300 bg-white px-3 py-2.5 text-base text-ink-900 placeholder:text-ink-600/60 focus:border-reed-500 focus:ring-2 focus:ring-reed-300/40 focus:outline-none';
-const label = 'block text-sm font-medium text-ink-800';
+const field = fieldClass;
+const label = labelClass;
 ---
 
 <section id={id} class="scroll-mt-28 rounded-md bg-white p-5 shadow-sm ring-1 ring-mist-200 sm:p-6">
@@ -37,11 +35,11 @@ const label = 'block text-sm font-medium text-ink-800';
     action={action}
     enctype={endpoint ? undefined : 'text/plain'}
     data-enquiry-form
-    data-endpoint={endpoint ?? ''}
+    data-endpoint={endpoint}
     data-email={CONTACT.email}
   >
     <input type="hidden" name="subject" value={subject} />
-    {tour && <input type="hidden" name="tour" value={tour} />}
+    {tour && <input type="hidden" name="tour" value={tour} data-label="Tour" />}
     <div class="hidden" aria-hidden="true">
       <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
     </div>
@@ -106,59 +104,6 @@ const label = 'block text-sm font-medium text-ink-800';
 </section>
 
 <script>
-  const LABELS: Record<string, string> = {
-    tour: 'Tour',
-    name: 'Name',
-    email: 'Email',
-    phone: 'Phone / WhatsApp',
-    country: 'Country',
-    travel_month: 'Travel month',
-    adults: 'Adults',
-    children: 'Children',
-    travel_type: 'Type of travel',
-    message: 'Message',
-  };
-
-  document.querySelectorAll<HTMLFormElement>('[data-enquiry-form]').forEach((form) => {
-    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
-    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const data = new FormData(form);
-      if (data.get('website')) return; // honeypot
-
-      const endpoint = form.dataset.endpoint;
-      if (!endpoint) {
-        const body = Object.entries(LABELS)
-          .filter(([key]) => data.get(key))
-          .map(([key, label]) => `${label}: ${data.get(key)}`)
-          .join('\n');
-        const subject = String(data.get('subject') ?? 'Safari enquiry');
-        window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        status.textContent = 'Your email app should open with your enquiry ready to send.';
-        return;
-      }
-
-      button.disabled = true;
-      status.className = 'text-sm text-ink-700';
-      status.textContent = 'Sending…';
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          body: data,
-          headers: { Accept: 'application/json' },
-        });
-        if (!res.ok) throw new Error(String(res.status));
-        form.reset();
-        status.className = 'text-sm font-medium text-moss-700';
-        status.textContent = 'Asante! Your enquiry has been sent. We’ll be in touch within one working day.';
-      } catch {
-        status.className = 'text-sm font-medium text-moss-700';
-        status.textContent = `Sorry, something went wrong. Please email ${form.dataset.email} or message us on WhatsApp.`;
-      } finally {
-        button.disabled = false;
-      }
-    });
-  });
+  import { wireForms } from '../lib/forms';
+  wireForms('[data-enquiry-form]', 'Asante! Your enquiry has been sent. We’ll be in touch within one working day.');
 </script>

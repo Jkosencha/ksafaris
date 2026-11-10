@@ -1,0 +1,173 @@
+---
+/**
+ * Booking request form: for guests who have chosen a tour and dates.
+ * Sends a request only; KSafaris confirms availability and payment details by reply.
+ * Field list is a placeholder until the client sends their booking requirements.
+ */
+import { getCollection } from 'astro:content';
+import { CONTACT, whatsappLink } from '../consts';
+import { FORM_ENDPOINT, fieldClass as field, labelClass as label } from '../lib/forms';
+import Icon from './Icon.astro';
+
+const tours = (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
+const endpoint = FORM_ENDPOINT;
+const legend = 'font-display text-xl uppercase text-ink-900';
+const fieldset = 'grid gap-4 border-t border-mist-200 pt-6 sm:grid-cols-2';
+---
+
+<form
+  class="space-y-8 rounded-md bg-white p-5 shadow-sm ring-1 ring-mist-200 sm:p-8"
+  method="post"
+  action={endpoint || `mailto:${CONTACT.email}`}
+  enctype={endpoint ? undefined : 'text/plain'}
+  data-booking-form
+  data-endpoint={endpoint}
+  data-email={CONTACT.email}
+>
+  <input type="hidden" name="subject" value="Booking request" data-booking-subject />
+  <div class="hidden" aria-hidden="true">
+    <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <fieldset class={fieldset} style="border-top: 0; padding-top: 0">
+    <legend class={legend}>1. Your safari</legend>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-tour">Tour *</label>
+      <select class={field} id="book-tour" name="tour" required data-booking-tour>
+        {tours.map((t) => <option value={t.data.title} data-slug={t.id}>{t.data.title} ({t.data.durationDays} days)</option>)}
+        <option value="Tailor-made safari">A tailor-made safari (tell us below)</option>
+      </select>
+    </div>
+    <div>
+      <label class={label} for="book-start">Preferred start date *</label>
+      <input class={field} id="book-start" name="start_date" type="date" required />
+    </div>
+    <div>
+      <label class={label} for="book-flex">How flexible are your dates?</label>
+      <select class={field} id="book-flex" name="date_flexibility">
+        <option>Fixed dates</option>
+        <option>Plus or minus a few days</option>
+        <option>Flexible within the month</option>
+      </select>
+    </div>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-level">Accommodation level</label>
+      <select class={field} id="book-level" name="accommodation">
+        <option>As in the itinerary</option>
+        <option>Mid-range</option>
+        <option>Luxury</option>
+        <option>Not sure, please advise</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <fieldset class={fieldset}>
+    <legend class={legend}>2. Travellers &amp; rooms</legend>
+    <div>
+      <label class={label} for="book-adults">Adults *</label>
+      <input class={field} id="book-adults" name="adults" type="number" min="1" value="2" inputmode="numeric" required />
+    </div>
+    <div>
+      <label class={label} for="book-children">Children (under 16)</label>
+      <input class={field} id="book-children" name="children" type="number" min="0" value="0" inputmode="numeric" />
+    </div>
+    <div>
+      <label class={label} for="book-ages">Children’s ages</label>
+      <input class={field} id="book-ages" name="children_ages" placeholder="e.g. 8, 12" />
+    </div>
+    <div>
+      <label class={label} for="book-rooms">Rooms</label>
+      <input class={field} id="book-rooms" name="rooms" placeholder="e.g. 1 double, 1 twin" />
+    </div>
+  </fieldset>
+
+  <fieldset class={fieldset}>
+    <legend class={legend}>3. Lead traveller</legend>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-name">Full name (as in passport) *</label>
+      <input class={field} id="book-name" name="name" autocomplete="name" required />
+    </div>
+    <div>
+      <label class={label} for="book-email">Email *</label>
+      <input class={field} id="book-email" name="email" type="email" autocomplete="email" required />
+    </div>
+    <div>
+      <label class={label} for="book-phone">Phone / WhatsApp *</label>
+      <input class={field} id="book-phone" name="phone" type="tel" autocomplete="tel" required />
+    </div>
+    <div>
+      <label class={label} for="book-nationality">Nationality</label>
+      <input class={field} id="book-nationality" name="nationality" />
+    </div>
+    <div>
+      <label class={label} for="book-country">Country of residence</label>
+      <input class={field} id="book-country" name="country" autocomplete="country-name" />
+    </div>
+  </fieldset>
+
+  <fieldset class={fieldset}>
+    <legend class={legend}>4. Extras</legend>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-flights">Arrival and departure flights (if booked)</label>
+      <input class={field} id="book-flights" name="flights" placeholder="Flight numbers, dates and times" />
+    </div>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-requests">Special requests</label>
+      <textarea
+        class={field}
+        id="book-requests"
+        name="requests"
+        rows="4"
+        placeholder="Dietary needs, mobility, celebrations, extra nights, balloon safari…"></textarea>
+    </div>
+    <div class="sm:col-span-2">
+      <label class={label} for="book-source">How did you hear about us?</label>
+      <select class={field} id="book-source" name="heard_from">
+        <option value="">Choose one</option>
+        <option>Tripadvisor</option>
+        <option>SafariBookings</option>
+        <option>Google</option>
+        <option>Facebook / Instagram</option>
+        <option>Friend or family</option>
+        <option>Travelled with you before</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <div class="space-y-4 border-t border-mist-200 pt-6">
+    <label class="flex items-start gap-3 text-sm text-ink-800">
+      <input type="checkbox" name="confirm" value="Yes" required class="mt-0.5 size-4 accent-moss-700" data-label="Understands this is a booking request" />
+      <span>I understand this is a booking request. KSafaris will confirm availability, the final price and payment details before anything is booked. *</span>
+    </label>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <button type="submit" class="btn-primary py-3 text-base sm:flex-1">Send booking request</button>
+      <a
+        href={whatsappLink('Hello KSafaris, I would like to book a safari.')}
+        target="_blank"
+        rel="noopener"
+        class="btn border border-whatsapp py-3 text-whatsapp hover:bg-whatsapp/5 sm:flex-1"
+      >
+        <Icon name="whatsapp" class="size-5" />
+        Book on WhatsApp
+      </a>
+    </div>
+    <p class="text-sm" role="status" aria-live="polite" data-form-status></p>
+  </div>
+</form>
+
+<script>
+  import { wireForms } from '../lib/forms';
+
+  // Preselect the tour from /book?tour=<slug> and name it in the email subject.
+  const select = document.querySelector<HTMLSelectElement>('[data-booking-tour]');
+  const subject = document.querySelector<HTMLInputElement>('[data-booking-subject]');
+  const slug = new URLSearchParams(window.location.search).get('tour');
+  const match = select && [...select.options].find((o) => o.dataset.slug === slug);
+  if (match) match.selected = true;
+  const updateSubject = () => subject && select && (subject.value = `Booking request: ${select.value}`);
+  select?.addEventListener('change', updateSubject);
+  updateSubject();
+
+  wireForms('[data-booking-form]', 'Asante! Your booking request has been sent. We’ll confirm availability within one working day.');
+</script>
