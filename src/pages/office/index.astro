@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets';
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import PhotoStat from '../../components/office/PhotoStat.astro';
+import StagePill from '../../components/office/StagePill.astro';
+import { PHOTOS, TONE } from '../../lib/office';
+import { BOOKINGS, DEPARTURES, ENQUIRIES_PER_WEEK, HEADLINES, STAFF, WEBSITE_COUNTS } from '../../data/office-sample';
+
+const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+const latest = BOOKINGS.slice(0, 6);
+const maxWeek = Math.max(...ENQUIRIES_PER_WEEK);
+const departTones = ['teal', 'gold', 'leaf', 'clay'] as const;
+const card = 'rounded-xl bg-o-surface';
+const heading = 'font-display text-xl';
+---
+
+<OfficeLayout title="Overview">
+  <header class="relative isolate flex min-h-56 items-end overflow-hidden rounded-2xl text-white">
+    <Image src={PHOTOS.kilimanjaro} alt="" widths={[800, 1400, 2000]} sizes="(min-width: 1360px) 1300px, 100vw" class="absolute inset-0 -z-20 size-full object-cover object-[center_45%]" loading="eager" />
+    <div aria-hidden="true" class="absolute inset-0 -z-10 bg-[#121610]/50"></div>
+    <div class="flex w-full flex-wrap items-end justify-between gap-4 p-7">
+      <div>
+        <p class="font-hand text-2xl text-[#f3d48f]">{today}</p>
+        <h1 class="mt-0.5 font-display text-[42px] uppercase">Jambo, {STAFF.name}</h1>
+        <p class="mt-1.5 text-[15px] text-[#eef1ec]">Today: 2 new booking requests, 1 deposit to chase and 1 trip without a guide.</p>
+      </div>
+      <form role="search" action="/office/guests" class="flex h-11 min-w-64 items-center gap-2 rounded-full bg-o-surface px-3.5 text-sm text-o-muted">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input type="search" name="q" aria-label="Search" placeholder="Search guests, trips, bookings" class="w-full bg-transparent text-o-text outline-none placeholder:text-o-muted" />
+      </form>
+    </div>
+  </header>
+
+  <section aria-label="This week" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {HEADLINES.map((h) => <PhotoStat {...h} />)}
+  </section>
+
+  <div class="flex flex-wrap items-start gap-6">
+    <section aria-labelledby="latest" class:list={[card, 'min-w-0 flex-[999_1_520px]']}>
+      <div class="flex items-center justify-between px-5 py-4">
+        <h2 id="latest" class={heading}>Latest requests</h2>
+        <a href="/office/bookings" class="text-sm font-semibold text-o-link">All bookings</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr class="text-left text-xs tracking-wider text-o-muted uppercase">
+              <th class="px-5 py-3 font-semibold">Guest</th>
+              <th class="px-2 py-3 font-semibold">Tour</th>
+              <th class="px-2 py-3 font-semibold">Start</th>
+              <th class="px-2 py-3 font-semibold">Pax</th>
+              <th class="px-2 py-3 font-semibold">Stage</th>
+              <th class="px-5 py-3 font-semibold">Received</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              latest.map((b) => (
+                <tr class="border-t border-o-line">
+                  <td class="px-5 py-3">
+                    <a href={`/office/bookings/${b.id}`} class="block font-semibold text-o-text hover:underline">{b.guest}</a>
+                    <span class="text-xs text-o-muted">{b.country}</span>
+                  </td>
+                  <td class="px-2 py-2.5">
+                    <span class="flex items-center gap-2.5">
+                      <Image src={PHOTOS[b.photo]} alt="" width={96} height={72} class="h-9 w-12 shrink-0 rounded-md object-cover" />
+                      {b.tour}
+                    </span>
+                  </td>
+                  <td class="px-2 py-3 whitespace-nowrap">{b.start}</td>
+                  <td class="px-2 py-3">{b.pax}</td>
+                  <td class="px-2 py-3"><StagePill stage={b.stage} /></td>
+                  <td class="px-5 py-3 whitespace-nowrap text-o-muted">{b.received}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="departing" class:list={[card, 'flex-[1_1_300px]']}>
+      <div class="flex items-center justify-between px-5 py-4">
+        <h2 id="departing" class={heading}>Departing soon</h2>
+        <a href="/office/trips" class="text-sm font-semibold text-o-link">Calendar</a>
+      </div>
+      <ul class="space-y-3 px-5 pb-5">
+        {
+          DEPARTURES.map((d, i) => (
+            <li class="flex gap-3.5">
+              <span class="relative h-16 w-21 shrink-0 overflow-hidden rounded-lg">
+                <Image src={PHOTOS[d.photo]} alt="" width={168} height={132} class="size-full object-cover" />
+                <span class:list={['absolute bottom-1 left-1 rounded-md px-1.5 text-[11px] font-bold', TONE[departTones[i % 4]].chip]}>
+                  {d.day} {d.month}
+                </span>
+              </span>
+              <span class="flex min-w-0 flex-col gap-0.5 text-sm">
+                <span class="font-semibold">{d.guest}</span>
+                <span class="text-o-soft">{d.tour}</span>
+                {d.guide ? (
+                  <span class="text-xs text-o-muted">Guide {d.guide} · {d.vehicle}</span>
+                ) : (
+                  <span class="text-xs font-bold text-clay-ink">Guide not assigned · {d.vehicle}</span>
+                )}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <div class="flex flex-wrap items-stretch gap-6">
+    <section aria-labelledby="enquiries" class:list={[card, 'flex flex-[2_1_420px] flex-col gap-4 p-5']}>
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="enquiries" class={heading}>Enquiries per week</h2>
+        <span class="text-[13px] text-o-muted">Last 12 weeks · this week in gold</span>
+      </div>
+      <div
+        role="img"
+        aria-label={`Enquiries per week over the last 12 weeks, from ${ENQUIRIES_PER_WEEK[0]} to ${ENQUIRIES_PER_WEEK.at(-1)}`}
+        class="flex h-36 items-end justify-around gap-2 border-b border-o-line2"
+      >
+        {
+          ENQUIRIES_PER_WEEK.map((v, i) => (
+            <span
+              title={`${v} enquiries`}
+              class:list={['w-full max-w-6 rounded-t', i === ENQUIRIES_PER_WEEK.length - 1 ? 'bg-chart-b' : 'bg-chart-a']}
+              style={`height: ${(v / maxWeek) * 100}%`}
+            />
+          ))
+        }
+      </div>
+      <div aria-hidden="true" class="flex justify-between text-xs text-o-muted"><span>12 weeks ago</span><span>This week</span></div>
+    </section>
+
+    <section aria-labelledby="website" class="flex flex-[1_1_300px] flex-col gap-3.5 rounded-xl bg-leaf-soft p-5 text-leaf-ink">
+      <h2 id="website" class={heading}>Website</h2>
+      <ul class="space-y-2.5 text-sm">
+        {
+          WEBSITE_COUNTS.map((w) => (
+            <li class="flex justify-between">
+              <span>{w.label}</span>
+              <a href="/office/website" class="font-bold text-inherit">{w.value} · Edit</a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-auto text-[13px]">Last published 2 days ago</p>
+    </section>
+  </div>
+</OfficeLayout>

@@ -110,3 +110,124 @@
     @apply font-medium text-moss-700 underline underline-offset-2 hover:text-moss-600;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Staff dashboard ("KSAFARIS office"). Colours live in variables on   */
+/* html.office so light and dark mode share the same utility classes. */
+/* Meaning: teal = new, gold = quoted or unsaved, clay = needs         */
+/* chasing, leaf = confirmed or paid.                                  */
+/* ------------------------------------------------------------------ */
+@theme inline {
+  --color-o-bg: var(--o-bg);
+  --color-o-surface: var(--o-surface);
+  --color-o-surface2: var(--o-surface2);
+  --color-o-line: var(--o-line);
+  --color-o-line2: var(--o-line2);
+  --color-o-text: var(--o-text);
+  --color-o-soft: var(--o-soft);
+  --color-o-muted: var(--o-muted);
+  --color-o-bar: var(--o-bar);
+  --color-o-bar-text: var(--o-bar-text);
+  --color-o-bar-muted: var(--o-bar-muted);
+  --color-o-pill: var(--o-pill);
+  --color-o-pill-text: var(--o-pill-text);
+  --color-o-link: var(--o-link);
+  --color-teal: var(--o-teal);
+  --color-teal-soft: var(--o-teal-soft);
+  --color-teal-ink: var(--o-teal-ink);
+  --color-teal-wash: var(--o-teal-wash);
+  --color-gold: var(--o-gold);
+  --color-gold-soft: var(--o-gold-soft);
+  --color-gold-ink: var(--o-gold-ink);
+  --color-gold-wash: var(--o-gold-wash);
+  --color-clay: var(--o-clay);
+  --color-clay-soft: var(--o-clay-soft);
+  --color-clay-ink: var(--o-clay-ink);
+  --color-clay-wash: var(--o-clay-wash);
+  --color-leaf: var(--o-leaf);
+  --color-leaf-soft: var(--o-leaf-soft);
+  --color-leaf-ink: var(--o-leaf-ink);
+  --color-leaf-wash: var(--o-leaf-wash);
+  --color-chart-a: var(--o-chart-a);
+  --color-chart-b: var(--o-chart-b);
+}
+
+html.office {
+  color-scheme: light;
+  --o-bg: #f2f4f3;
+  --o-surface: #ffffff;
+  --o-surface2: #eef1ef;
+  --o-line: #e6ebe9;
+  --o-line2: #c8cdc9;
+  --o-text: #232622;
+  --o-soft: #474c46;
+  --o-muted: #5c625b;
+  --o-bar: #485342;
+  --o-bar-text: #f2f4f3;
+  --o-bar-muted: #e3e9df;
+  --o-pill: #f2f4f3;
+  --o-pill-text: #2c3329;
+  --o-link: #3f6a31;
+  --o-teal: #2f8c94;
+  --o-teal-soft: #d5ecec;
+  --o-teal-ink: #17575c;
+  --o-teal-wash: #17575c;
+  --o-gold: #e0a93b;
+  --o-gold-soft: #f7e6bf;
+  --o-gold-ink: #6b4a0c;
+  --o-gold-wash: #5a3e08;
+  --o-clay: #c9673d;
+  --o-clay-soft: #f6dccf;
+  --o-clay-ink: #7a3417;
+  --o-clay-wash: #7a3417;
+  --o-leaf: #5a8f45;
+  --o-leaf-soft: #dcebd2;
+  --o-leaf-ink: #2f5222;
+  --o-leaf-wash: #2f5222;
+  --o-chart-a: #00879c;
+  --o-chart-b: #c47f0a;
+}
+
+html.office[data-theme='dark'] {
+  color-scheme: dark;
+  --o-bg: #141713;
+  --o-surface: #1d211b;
+  --o-surface2: #262b24;
+  --o-line: #2a3027;
+  --o-line2: #3e463a;
+  --o-text: #eef1ec;
+  --o-soft: #c9cfc5;
+  --o-muted: #a3aa9f;
+  --o-bar: #232920;
+  --o-bar-text: #eef1ec;
+  --o-bar-muted: #c2cabd;
+  --o-pill: #3a4335;
+  --o-pill-text: #ffffff;
+  --o-link: #9bcb83;
+  --o-teal: #5bb8bf;
+  --o-teal-soft: #173b3e;
+  --o-teal-ink: #9fe0e4;
+  --o-teal-wash: #0f3335;
+  --o-gold: #e6b552;
+  --o-gold-soft: #3d3118;
+  --o-gold-ink: #f3d48f;
+  --o-gold-wash: #3a2a08;
+  --o-clay: #e48a62;
+  --o-clay-soft: #45261a;
+  --o-clay-ink: #f5b89b;
+  --o-clay-wash: #3f1a0c;
+  --o-leaf: #8cc474;
+  --o-leaf-soft: #22381b;
+  --o-leaf-ink: #bfe3ad;
+  --o-leaf-wash: #1b3014;
+  --o-chart-a: #0f98a8;
+  --o-chart-b: #c4851f;
+}
+
+html.office body {
+  background: var(--o-bg);
+  color: var(--o-text);
+}
+html.office h2 {
+  text-transform: uppercase;
+}

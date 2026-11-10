@@ -1,0 +1,30 @@
+---
+/**
+ * Headline number on a tour photo under a deep wash of its meaning colour.
+ * The wash is dark enough for white text over the brightest part of any photo.
+ */
+import { Image } from 'astro:assets';
+import { PHOTOS, TONE } from '../../lib/office';
+import type { PhotoKey, Tone } from '../../data/office-sample';
+
+interface Props {
+  label: string;
+  value: string;
+  note?: string;
+  tone: Tone;
+  photo: PhotoKey;
+  /** "lg" is the one hero figure on a page. */
+  size?: 'md' | 'lg';
+  class?: string;
+}
+
+const { label, value, note, tone, photo, size = 'md', class: className } = Astro.props;
+---
+
+<div class:list={['relative isolate overflow-hidden rounded-xl text-white', size === 'lg' ? 'min-h-44 p-6' : 'min-h-37 p-5', className]}>
+  <Image src={PHOTOS[photo]} alt="" widths={[400, 800]} sizes="(min-width: 1024px) 33vw, 100vw" class="absolute inset-0 -z-20 size-full object-cover" />
+  <span aria-hidden="true" class:list={['absolute inset-0 -z-10 opacity-[0.86]', TONE[tone].wash]}></span>
+  <p class="text-[13px] font-bold">{label}</p>
+  <p class:list={['mt-1 leading-tight', size === 'lg' ? 'text-[56px] font-semibold tracking-tight' : 'font-display text-[38px]']}>{value}</p>
+  {note && <p class="mt-1.5 inline-block rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold text-[#1d211b]">{note}</p>}
+</div>

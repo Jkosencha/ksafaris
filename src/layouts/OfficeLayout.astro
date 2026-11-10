@@ -1,0 +1,117 @@
+---
+/**
+ * Layout for the staff dashboard ("KSAFARIS office"): olive top bar with the
+ * page tabs, a four-colour stripe, and a light/dark switch that remembers the
+ * choice and otherwise follows the computer's setting.
+ * Not linked from the public site and kept out of search engines.
+ */
+import '../styles/global.css';
+import { OFFICE_NAV } from '../lib/office';
+import { STAFF } from '../data/office-sample';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/office' ? path === '/office' : path.startsWith(href));
+---
+
+<!doctype html>
+<html lang="en" class="office">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#485342" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | KSafaris office</title>
+    <script is:inline>
+      // Set the theme before the page paints, so there is no flash of the wrong mode.
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('office-theme'); } catch (e) {}
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh font-sans antialiased">
+    <a href="#main" class="sr-only z-50 rounded bg-white px-4 py-2 text-ink-900 focus:not-sr-only focus:fixed focus:top-2 focus:left-2">
+      Skip to content
+    </a>
+    <header class="bg-o-bar text-o-bar-text">
+      <div class="mx-auto flex min-h-17 max-w-[1360px] flex-wrap items-center gap-x-8 gap-y-3 px-4 py-3 sm:px-8">
+        <a href="/office" class="font-display text-[22px] tracking-wider text-o-bar-text no-underline">
+          KSAFARIS <span class="font-hand text-lg tracking-normal text-gold">office</span>
+        </a>
+        <nav aria-label="Dashboard" class="order-3 w-full overflow-x-auto lg:order-none lg:w-auto">
+          <ul class="flex gap-1">
+            {
+              OFFICE_NAV.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    class:list={[
+                      'flex min-h-11 items-center gap-2 rounded-full px-3.5 text-[15px] whitespace-nowrap no-underline',
+                      isActive(item.href) ? 'bg-o-pill font-bold text-o-pill-text' : 'text-o-bar-muted hover:bg-white/10',
+                    ]}
+                  >
+                    {item.label}
+                    {'count' in item && (
+                      <span class="rounded-full bg-gold px-2 text-xs font-bold text-[#2b2208]">{item.count}</span>
+                    )}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <div class="ml-auto flex items-center gap-2.5">
+          <button
+            type="button"
+            data-theme-toggle
+            aria-label="Switch to dark mode"
+            class="flex size-11 items-center justify-center rounded-full border border-white/30 text-o-bar-text hover:bg-white/10"
+          >
+            <svg data-icon="moon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+            <svg data-icon="sun" aria-hidden="true" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </button>
+          <a href="/office/bookings/new" class="flex h-11 items-center rounded-full bg-gold px-4 text-sm font-bold text-[#2b2208] no-underline">+ New booking</a>
+          <span role="img" aria-label={`Signed in as ${STAFF.name}`} class="flex size-9 items-center justify-center rounded-full bg-teal font-bold text-[#0e1d1e]">
+            {STAFF.name.charAt(0)}
+          </span>
+        </div>
+      </div>
+    </header>
+    <div aria-hidden="true" class="grid h-1 grid-cols-4">
+      <span class="bg-teal"></span><span class="bg-gold"></span><span class="bg-clay"></span><span class="bg-leaf"></span>
+    </div>
+    <main id="main" class="mx-auto flex w-full max-w-[1360px] flex-col gap-7 px-4 pt-7 pb-12 sm:px-8">
+      <slot />
+    </main>
+
+    <script>
+      const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]')!;
+      const sync = () => {
+        const dark = document.documentElement.dataset.theme === 'dark';
+        button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+        button.querySelector('[data-icon="moon"]')!.classList.toggle('hidden', dark);
+        button.querySelector('[data-icon="sun"]')!.classList.toggle('hidden', !dark);
+      };
+      button.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('office-theme', next);
+        } catch {
+          /* private mode: the choice just isn't remembered */
+        }
+        sync();
+      });
+      sync();
+    </script>
+  </body>
+</html>

@@ -8,7 +8,7 @@ export default defineConfig({
   site: 'https://ksafaris-africanexpeditions.com',
   output: 'static',
   trailingSlash: 'ignore',
-  integrations: [sitemap({ filter: (page) => !page.includes('/credits') && !page.endsWith('/book/') })],
+  integrations: [sitemap({ filter: (page) => !page.includes('/credits') && !page.endsWith('/book/') && !page.includes('/office') })],
   vite: {
     plugins: [tailwindcss()],
   },

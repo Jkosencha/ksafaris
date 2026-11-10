@@ -1,0 +1,15 @@
+---
+import { STAGES, type Stage } from '../../data/office-sample';
+import { TONE } from '../../lib/office';
+
+interface Props {
+  stage: Stage;
+}
+
+const { stage } = Astro.props;
+const { label, tone } = STAGES[stage];
+// "Paid" gets the solid colour so it stands apart from "Confirmed".
+const look = stage === 'paid' ? TONE[tone].solid : TONE[tone].chip;
+---
+
+<span class:list={['inline-block rounded-full px-2.5 py-0.5 text-xs font-bold whitespace-nowrap', look]}>{label}</span>
