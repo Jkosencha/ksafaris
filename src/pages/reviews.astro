@@ -1,21 +1,13 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import heroImage from '../assets/images/placeholders/amboseli-elephant.jpg';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import { getReviews } from '../lib/reviews';
 import { SOCIAL } from '../consts';
 
-const reviews = (await getCollection('reviews')).sort(
-  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
-);
-const tourTitles = new Map<string, string>();
-for (const r of reviews) {
-  if (r.data.tour && !tourTitles.has(r.data.tour.id)) {
-    const t = await getEntry(r.data.tour);
-    if (t) tourTitles.set(t.id, t.data.title);
-  }
-}
+const reviews = await getReviews();
 
 const description =
   'Read independent reviews of KSafaris & African Expeditions on Tripadvisor and SafariBookings.';
@@ -32,7 +24,23 @@ const platforms = [
     lead="We’re proud to be rated by our guests on independent review platforms. Read their stories, and if you’ve travelled with us, we’d love to hear yours."
   />
 
-  <section aria-label="Review platforms" class="container-page mt-12 grid gap-6 sm:grid-cols-2">
+
+  {
+    reviews.length > 0 && (
+      <section aria-labelledby="guest-reviews" class="container-page mt-12">
+        <h2 id="guest-reviews" class="text-3xl font-semibold">Guest reviews</h2>
+        <ul class="mt-6 gap-6 md:columns-2 lg:columns-3">
+          {reviews.map(({ review, tourTitle }) => (
+            <li class="mb-6 break-inside-avoid">
+              <ReviewCard review={review} tourTitle={tourTitle} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section aria-label="Review platforms" class="container-page mt-10 grid gap-6 sm:grid-cols-2">
     {
       platforms.map((p) => (
         <a
@@ -53,39 +61,6 @@ const platforms = [
       ))
     }
   </section>
-
-  {
-    reviews.length > 0 && (
-      <section aria-labelledby="guest-reviews" class="container-page mt-16">
-        <h2 id="guest-reviews" class="text-3xl font-semibold">Guest reviews</h2>
-        <ul class="mt-6 grid gap-6 md:grid-cols-2">
-          {reviews.map((r) => (
-            <li>
-              <figure class="h-full rounded-md bg-white p-6 ring-1 ring-mist-200">
-                {r.data.rating && (
-                  <p class="text-reed-500" aria-label={`${r.data.rating} out of 5`}>
-                    {'★'.repeat(r.data.rating)}
-                    <span class="text-mist-300">{'★'.repeat(5 - r.data.rating)}</span>
-                  </p>
-                )}
-                <blockquote class="mt-3 font-display text-lg leading-relaxed text-ink-900">“{r.data.quote}”</blockquote>
-                <figcaption class="mt-4 text-sm text-ink-700">
-                  <span class="font-semibold text-ink-900">{r.data.author}</span>
-                  {r.data.country && <>, {r.data.country}</>}
-                  {r.data.tour && tourTitles.get(r.data.tour.id) && (
-                    <> · <a href={`/tours/${r.data.tour.id}`} class="underline underline-offset-2">{tourTitles.get(r.data.tour.id)}</a></>
-                  )}
-                  <span class="block">
-                    via {r.data.sourceUrl ? <a href={r.data.sourceUrl} target="_blank" rel="noopener" class="underline underline-offset-2">{r.data.source}</a> : r.data.source}
-                  </span>
-                </figcaption>
-              </figure>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
 
   <section class="container-page mt-16">
     <div class="rounded-md bg-mist-100 px-6 py-10 text-center sm:px-12">

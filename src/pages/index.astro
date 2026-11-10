@@ -5,6 +5,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DestinationCard from '../components/DestinationCard.astro';
 import TourCard from '../components/TourCard.astro';
 import ReviewBadges from '../components/ReviewBadges.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import { getReviews } from '../lib/reviews';
 import Icon from '../components/Icon.astro';
 import TornEdge from '../components/TornEdge.astro';
 import PhotoBand from '../components/PhotoBand.astro';
@@ -21,6 +23,7 @@ import { travelAgency } from '../lib/schema';
 const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
 const tours = (await getCollection('tours', (t) => t.data.featured)).sort((a, b) => a.data.order - b.data.order);
 const logoImg = await getImage({ src: logo, format: 'png' });
+const reviews = (await getReviews()).slice(0, 3);
 
 const pillars = [
   {
@@ -166,7 +169,19 @@ const pillars = [
     <p class="eyebrow">Reviews</p>
     <h2 id="reviews" class="mt-2 text-3xl sm:text-4xl">Read what our travellers say</h2>
     <p class="mx-auto mt-3 max-w-xl text-ink-700">Independent reviews from guests who have travelled with us.</p>
-    <ReviewBadges class="mt-6 justify-center" />
+    {
+      reviews.length > 0 && (
+        <ul class="mt-10 grid gap-6 md:grid-cols-3">
+          {reviews.map(({ review, tourTitle }) => (
+            <li>
+              <ReviewCard review={review} tourTitle={tourTitle} />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <ReviewBadges class="mt-10 justify-center" />
+    {reviews.length > 0 && <a href="/reviews" class="btn-outline mt-6 text-moss-700 hover:bg-moss-700/5">Read more reviews</a>}
   </section>
 
   <section class="relative isolate overflow-hidden py-24 text-center text-white sm:py-32">

@@ -74,6 +74,8 @@ const reviews = defineCollection({
     sourceUrl: z.url().optional(),
     date: z.coerce.date().optional(),
     tour: reference('tours').optional(),
+    /** Placeholder text for design previews. Shown with a "Sample review" tag; delete before launch. */
+    sample: z.boolean().default(false),
   }),
 });
 

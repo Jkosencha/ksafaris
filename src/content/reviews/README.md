@@ -14,3 +14,8 @@ sourceUrl: https://www.tripadvisor.com/...
 date: 2025-08-14
 tour: 13-days-kenya-tanzania-expedition # optional, must match a tour file name
 ```
+
+## Sample reviews
+
+The `sample-*.yaml` files are made-up placeholder reviews so the design can be previewed. They show a
+"Sample review" tag and the build prints a warning while they exist. Delete them all before launch.
