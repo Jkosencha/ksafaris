@@ -24,6 +24,16 @@ const { jsonLd, ...seo } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="generator" content={Astro.generator} />
     <SEO {...seo} />
+    <script is:inline>
+      // Scroll animations: only when the visitor hasn't asked for reduced motion.
+      // If the animation script never runs, a timer shows everything anyway.
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('reveal-on');
+        setTimeout(function () {
+          if (!window.__reveal) document.documentElement.classList.remove('reveal-on');
+        }, 2500);
+      }
+    </script>
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body class="flex min-h-dvh flex-col">
@@ -39,5 +49,54 @@ const { jsonLd, ...seo } = Astro.props;
     </main>
     <Footer />
     <WhatsAppButton />
+    <script is:inline>
+      // Scroll animations. Elements slide in from mixed directions as they enter
+      // the screen and reset once fully off screen, so they play again on the
+      // way back. Forms never move.
+      (function () {
+        var root = document.documentElement;
+        var main = document.querySelector('main');
+        if (!root.classList.contains('reveal-on') || !main || !('IntersectionObserver' in window)) {
+          root.classList.remove('reveal-on');
+          return;
+        }
+        window.__reveal = true;
+        var tall = window.innerHeight * 1.2;
+        function mark(el, dir, delay) {
+          if (el.hasAttribute('data-reveal') || el.closest('form, [data-no-reveal]')) return;
+          if (el.parentElement && el.parentElement.closest('[data-reveal]')) return;
+          el.setAttribute('data-reveal', dir);
+          if (delay) el.style.setProperty('--reveal-delay', delay + 'ms');
+        }
+        // Card grids: a different starting direction for each grid, staggered.
+        var dirs = ['up', 'left', 'down', 'right', 'zoom'];
+        main.querySelectorAll('.grid').forEach(function (grid, g) {
+          Array.prototype.forEach.call(grid.children, function (child, i) {
+            if (child.offsetHeight > tall) return; // page layout columns, not cards
+            mark(child, dirs[(g + i) % dirs.length], (i % 4) * 90);
+          });
+        });
+        // Itinerary days alternate.
+        main.querySelectorAll('[data-reveal-list] > li').forEach(function (li, i) {
+          mark(li, i % 2 ? 'up' : 'left');
+        });
+        main.querySelectorAll('h1').forEach(function (el) { mark(el, 'down'); });
+        main.querySelectorAll('.eyebrow').forEach(function (el) { mark(el, 'left'); });
+        main.querySelectorAll('h2').forEach(function (el) { mark(el, 'up'); });
+        main.querySelectorAll('h2 + p, h1 + p').forEach(function (el) { mark(el, 'up', 120); });
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              var enough = e.intersectionRatio >= 0.12 || e.intersectionRect.height > window.innerHeight * 0.25;
+              if (e.isIntersecting && enough) e.target.classList.add('is-revealed');
+              else if (!e.isIntersecting) e.target.classList.remove('is-revealed');
+            });
+          },
+          { threshold: [0, 0.12, 0.25], rootMargin: '0px 0px -6% 0px' },
+        );
+        main.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+      })();
+    </script>
   </body>
 </html>
