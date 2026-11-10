@@ -1,0 +1,272 @@
+---
+/**
+ * Website editor. Reads the live site content (tours, destinations, reviews)
+ * so staff see exactly what guests see. Edits are tracked on the page; saving
+ * and publishing arrive with the database.
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { TONE } from '../../lib/office';
+
+const tours = (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
+const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
+const reviews = await getCollection('reviews');
+const samples = reviews.filter((r) => r.data.sample).length;
+
+const tabs = [
+  { key: 'tours', label: 'Tours', badge: '' },
+  { key: 'destinations', label: 'Destinations', badge: '' },
+  { key: 'reviews', label: 'Reviews', badge: samples ? `${samples} samples` : '' },
+  { key: 'photos', label: 'Photos', badge: '' },
+  { key: 'pages', label: 'Pages', badge: '' },
+  { key: 'contact', label: 'Contact details', badge: '' },
+];
+const field = 'mt-1 block w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text placeholder:text-o-muted data-[changed]:border-2 data-[changed]:border-gold data-[changed]:bg-gold-soft';
+const label = 'text-[13px] font-bold text-o-soft';
+---
+
+<OfficeLayout title="Website">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-[34px] uppercase">Website</h1>
+      <p class="mt-1.5 text-[15px] text-o-muted">Change what guests see on ksafaris-africanexpeditions.com. Nothing goes live until you press Publish.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3 rounded-full bg-leaf-soft py-2 pr-2 pl-4 text-leaf-ink data-[dirty]:bg-gold-soft data-[dirty]:text-gold-ink" data-publish-bar>
+      <span class="text-sm" data-publish-text>Everything is live</span>
+      <a href="/" target="_blank" class="flex min-h-10 items-center rounded-full border border-current px-3.5 text-sm font-bold text-inherit">View site</a>
+      <button type="button" class="min-h-10 rounded-full bg-leaf px-4.5 text-sm font-bold text-[#10170d]" data-publish>Publish</button>
+    </div>
+  </div>
+
+  <div role="tablist" aria-label="Website sections" class="-mb-2 flex flex-wrap gap-1.5 border-b border-o-line2">
+    {
+      tabs.map((t, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${t.key}`}
+          aria-controls={`panel-${t.key}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          class="-mb-px flex min-h-11 items-center gap-2 border-b-3 border-transparent px-3.5 text-[15px] text-o-soft aria-selected:border-teal aria-selected:font-bold aria-selected:text-o-text"
+        >
+          {t.label}
+          {t.badge && <span class:list={['rounded-full px-2 text-xs font-bold', TONE.clay.chip]}>{t.badge}</span>}
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- Tours -->
+  <div role="tabpanel" id="panel-tours" aria-labelledby="tab-tours" class="flex flex-wrap items-start gap-6">
+    <div class="flex flex-[1_1_300px] flex-col gap-2.5">
+      {
+        tours.map((t, i) => (
+          <button
+            type="button"
+            data-pick-tour={t.id}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            class="flex items-center gap-3 rounded-xl bg-o-surface p-2.5 text-left text-o-text aria-pressed:bg-gold-soft aria-pressed:text-gold-ink"
+          >
+            <Image src={t.data.heroImage} alt="" width={144} height={112} class="h-14 w-18 shrink-0 rounded-md object-cover" />
+            <span class="flex min-w-0 flex-col gap-1">
+              <span class="text-[15px] font-bold">{t.data.title}</span>
+              <span class:list={['self-start rounded-full px-2 text-xs font-bold', TONE.leaf.chip]}>Live</span>
+            </span>
+          </button>
+        ))
+      }
+      <button type="button" class="min-h-12 rounded-xl border border-dashed border-teal font-bold text-teal-ink">+ Add a tour</button>
+    </div>
+
+    {
+      tours.map((t, i) => (
+        <form data-tour-editor={t.id} hidden={i !== 0} class="flex min-w-0 flex-[999_1_600px] flex-col gap-5 rounded-xl bg-o-surface p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 class="font-display text-[22px]">{t.data.title}</h2>
+            <a href={`/tours/${t.id}`} target="_blank" class="text-sm font-bold text-o-link">View on the website</a>
+          </div>
+
+          <div class="flex flex-wrap gap-5">
+            <div class="flex flex-[1_1_260px] flex-col gap-2">
+              <span class={label}>Main photo</span>
+              <div class="relative h-44 overflow-hidden rounded-lg">
+                <Image src={t.data.heroImage} alt={t.data.heroAlt} widths={[480, 800]} sizes="320px" class="size-full object-cover" />
+              </div>
+              <button type="button" class="min-h-10 rounded-full bg-o-surface2 text-[13px] font-bold">Replace photo</button>
+            </div>
+            <div class="grid flex-[2_1_320px] grid-cols-2 content-start gap-3.5">
+              <label class:list={[label, 'col-span-2']}>Tour name<input name="title" value={t.data.title} class:list={[field, 'min-h-11']} /></label>
+              <label class={label}>Days<input name="days" value={t.data.durationDays} inputmode="numeric" class:list={[field, 'min-h-11']} /></label>
+              <label class={label}>
+                Price from (USD per person)
+                <input name="price" value={t.data.priceFrom ?? ''} placeholder="Price on request" inputmode="numeric" class:list={[field, 'min-h-11']} />
+              </label>
+              <label class="col-span-2 flex min-h-11 items-center gap-2.5 text-sm">
+                <input type="checkbox" name="featured" checked={t.data.featured} class="size-4.5 accent-leaf" /> Show on the home page
+              </label>
+            </div>
+          </div>
+
+          <label class={label}>
+            Short description
+            <textarea name="summary" rows="3" class:list={[field, 'resize-y py-2.5 leading-normal']}>{t.data.summary}</textarea>
+          </label>
+
+          <div class="flex flex-col gap-2">
+            <span class={label}>Route, in order (shown on the map)</span>
+            <ol class="flex flex-wrap gap-2">
+              {t.data.route.map((stop, n) => (
+                <li class:list={['flex items-center gap-1 rounded-full py-1 pr-1 pl-3 text-sm font-semibold', TONE.teal.chip]}>
+                  <span class="text-xs opacity-80">{n + 1}</span> {stop}
+                  <button type="button" aria-label={`Remove ${stop}`} class="size-7 rounded-full text-base">×</button>
+                </li>
+              ))}
+              <li>
+                <button type="button" class="min-h-9 rounded-full border border-dashed border-teal px-3.5 text-[13px] font-bold text-teal-ink">+ Add stop</button>
+              </li>
+            </ol>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex items-baseline justify-between">
+              <span class={label}>Day by day</span>
+              <button type="button" class="min-h-9 px-3 text-[13px] font-bold text-teal-ink">+ Add a day</button>
+            </div>
+            <div class="overflow-hidden rounded-lg bg-o-surface2">
+              {t.data.itinerary.map((d, n) => (
+                <details class="group" open={n === 0}>
+                  <summary class="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 text-[15px] group-open:bg-o-surface2 [&::-webkit-details-marker]:hidden">
+                    <span class:list={['flex h-7.5 min-w-7.5 items-center justify-center rounded-full px-2 text-xs font-bold', TONE.leaf.chip]}>{d.day}</span>
+                    {d.title}
+                    <span aria-hidden="true" class="ml-auto text-o-muted transition group-open:rotate-90">›</span>
+                  </summary>
+                  <div class="flex flex-col gap-3 px-4 pb-4">
+                    <label class={label}>Day title<input name={`day-${n}-title`} value={d.title} class:list={[field, 'min-h-10']} /></label>
+                    <label class={label}>
+                      What happens
+                      <textarea name={`day-${n}-text`} rows="4" class:list={[field, 'resize-y py-2.5 text-sm leading-normal']}>{d.description}</textarea>
+                    </label>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <label class={label}>Overnight<input name={`day-${n}-overnight`} value={d.overnight ?? ''} class:list={[field, 'min-h-10 text-sm']} /></label>
+                      <label class={label}>Meals<input name={`day-${n}-meals`} value={d.mealPlan ?? ''} class:list={[field, 'min-h-10 text-sm']} /></label>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+
+          <div class="flex flex-wrap justify-end gap-2.5 pt-1">
+            <button type="reset" class="min-h-11 rounded-full bg-o-surface2 px-4.5 text-sm font-bold">Discard changes</button>
+            <button type="submit" class="min-h-11 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Save</button>
+          </div>
+        </form>
+      ))
+    }
+  </div>
+
+  <!-- Destinations -->
+  <div role="tabpanel" id="panel-destinations" aria-labelledby="tab-destinations" hidden class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      destinations.map((d) => (
+        <article class="overflow-hidden rounded-xl bg-o-surface">
+          <Image src={d.data.heroImage} alt="" widths={[480, 800]} sizes="(min-width: 1024px) 420px, 100vw" class="h-36 w-full object-cover" />
+          <div class="flex items-start justify-between gap-3 p-4">
+            <div>
+              <h2 class="font-display text-xl">{d.data.name}</h2>
+              <p class="mt-1 text-sm text-o-muted">{d.data.tagline}</p>
+            </div>
+            <a href={`/destinations/${d.id}`} target="_blank" class="shrink-0 text-sm font-bold text-o-link">View</a>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <!-- Reviews -->
+  <div role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" hidden class="flex flex-col gap-3">
+    {
+      samples > 0 && (
+        <p class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.clay.card]}>
+          {samples} sample reviews are showing on the website for design only. Delete them before launch.
+        </p>
+      )
+    }
+    {
+      reviews.map((r) => (
+        <article class="flex flex-wrap items-start gap-4 rounded-xl bg-o-surface p-4">
+          <span aria-hidden="true" class:list={['flex size-10 shrink-0 items-center justify-center rounded-full font-display text-lg', TONE.teal.chip]}>{r.data.author.charAt(0)}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm">
+              <span class="font-bold">{r.data.author}</span>
+              <span class="text-o-muted"> · {r.data.country} · {r.data.source}</span>
+              {r.data.rating && <span class="ml-1 text-gold">{'★'.repeat(r.data.rating)}</span>}
+            </p>
+            <p class="mt-1 line-clamp-2 text-sm text-o-soft">{r.data.quote}</p>
+          </div>
+          {r.data.sample && <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.clay.chip]}>Sample</span>}
+        </article>
+      ))
+    }
+  </div>
+
+  {
+    ['photos', 'pages', 'contact'].map((key) => (
+      <div role="tabpanel" id={`panel-${key}`} aria-labelledby={`tab-${key}`} hidden class:list={['rounded-xl p-6 text-sm', TONE.gold.card]}>
+        This section arrives with the database: {key === 'photos' ? 'upload and organise photos for tours and destinations.' : key === 'pages' ? 'edit the About, CSR and home page text.' : 'phone, email, WhatsApp and social links shown across the site.'}
+      </div>
+    ))
+  }
+</OfficeLayout>
+
+<script>
+  // Tabs
+  const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+  tabs.forEach((tab) =>
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+      });
+    }),
+  );
+
+  // Pick which tour to edit
+  const picks = document.querySelectorAll<HTMLButtonElement>('[data-pick-tour]');
+  picks.forEach((pick) =>
+    pick.addEventListener('click', () => {
+      picks.forEach((p) => p.setAttribute('aria-pressed', String(p === pick)));
+      document.querySelectorAll<HTMLFormElement>('[data-tour-editor]').forEach((f) => (f.hidden = f.dataset.tourEditor !== pick.dataset.pickTour));
+    }),
+  );
+
+  // Track edits: highlight changed fields and count them in the publish bar.
+  const bar = document.querySelector<HTMLElement>('[data-publish-bar]')!;
+  const barText = bar.querySelector('[data-publish-text]')!;
+  const forms = document.querySelectorAll<HTMLFormElement>('[data-tour-editor]');
+  const fields = () => [...document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-tour-editor] input:not([type=checkbox]), [data-tour-editor] textarea')];
+
+  const refresh = () => {
+    let changed = 0;
+    fields().forEach((f) => {
+      const isChanged = f.value !== f.defaultValue;
+      f.toggleAttribute('data-changed', isChanged);
+      if (isChanged) changed++;
+    });
+    bar.toggleAttribute('data-dirty', changed > 0);
+    barText.innerHTML = changed ? `<b>${changed} change${changed === 1 ? '' : 's'}</b> not live yet` : 'Everything is live';
+  };
+  forms.forEach((form) => {
+    form.addEventListener('input', refresh);
+    form.addEventListener('reset', () => setTimeout(refresh));
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      barText.innerHTML = '<b>Saving and publishing</b> will work once the database is connected';
+    });
+  });
+  document.querySelector('[data-publish]')!.addEventListener('click', () => {
+    barText.innerHTML = '<b>Publishing</b> will work once the database is connected';
+  });
+</script>
