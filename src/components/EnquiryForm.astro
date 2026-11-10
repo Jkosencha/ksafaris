@@ -1,31 +1,48 @@
 ---
+/**
+ * The one guest form, in two stages:
+ *  - "Still exploring ideas": a short enquiry.
+ *  - "Ready to book": adds the details needed to hold a booking.
+ * Links can open it on a stage with data-set-stage="book|explore", or the page URL ?stage=book.
+ * Booking fields and steps are placeholders until the client confirms their process.
+ */
+import { getCollection } from 'astro:content';
 import { CONTACT, whatsappLink } from '../consts';
 import Icon from './Icon.astro';
 import { FORM_ENDPOINT, fieldClass, labelClass } from '../lib/forms';
 
 interface Props {
-  /** Tour title, sent with the enquiry when the form is on a tour page. */
+  /** Tour title, sent with the form when it is on a tour page. Without it, guests pick a tour. */
   tour?: string;
   id?: string;
-  heading?: string;
 }
 
-const { tour, id = 'plan', heading = 'Plan my safari' } = Astro.props;
+const { tour, id = 'plan' } = Astro.props;
 
+const tours = tour ? [] : (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
 const endpoint = FORM_ENDPOINT;
 const action = endpoint || `mailto:${CONTACT.email}`;
-const subject = tour ? `Safari enquiry: ${tour}` : 'Safari enquiry';
-const waText = tour
+const waExplore = tour
   ? `Hello KSafaris, I'm interested in the "${tour}" tour.`
   : 'Hello KSafaris, I would like to plan a safari.';
+const waBook = tour ? `Hello KSafaris, I would like to book the "${tour}" tour.` : 'Hello KSafaris, I would like to book a safari.';
+
+// Placeholder process; update once the client confirms their booking and payment terms.
+const steps = [
+  'Within one working day we check availability and send your final price.',
+  'We send payment details. Your booking is confirmed once payment is received.',
+  'You receive your final itinerary, vouchers and a pre-travel briefing.',
+];
 
 const field = fieldClass;
 const label = labelClass;
+const stageOption =
+  'flex cursor-pointer items-center justify-center rounded-md border border-mist-300 px-3 py-2.5 text-center text-sm font-medium text-ink-800 has-checked:border-moss-700 has-checked:bg-moss-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-reed-300';
 ---
 
-<section id={id} class="scroll-mt-28 rounded-md bg-white p-5 shadow-sm ring-1 ring-mist-200 sm:p-6">
-  <h2 class="text-2xl font-semibold">{heading}</h2>
-  <p class="mt-1 text-sm text-ink-700">
+<section id={id} class="scroll-mt-28 rounded-md bg-white p-5 shadow-sm ring-1 ring-mist-200 sm:p-6" data-plan>
+  <h2 class="text-2xl font-semibold" data-text-book="Book your safari">Plan my safari</h2>
+  <p class="mt-1 text-sm text-ink-700" data-text-book="Send your dates and travellers and we’ll confirm availability within one working day.">
     Tell us a little about your trip and a safari specialist will reply within one working day.
   </p>
 
@@ -38,14 +55,45 @@ const label = labelClass;
     data-endpoint={endpoint}
     data-email={CONTACT.email}
   >
-    <input type="hidden" name="subject" value={subject} />
-    {tour && <input type="hidden" name="tour" value={tour} data-label="Tour" />}
+    <input type="hidden" name="subject" value="Safari enquiry" data-subject />
+    {tour && <input type="hidden" name="tour" value={tour} data-label="Tour" data-tour />}
     <div class="hidden" aria-hidden="true">
       <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
     </div>
 
+    <fieldset class="sm:col-span-2">
+      <legend class={label}>Where are you in your planning?</legend>
+      <div class="mt-1 grid grid-cols-2 gap-2">
+        <label class={stageOption}>
+          <input type="radio" name="stage" value="Still exploring ideas" data-stage="explore" data-label="Stage" class="sr-only" checked />
+          Still exploring ideas
+        </label>
+        <label class={stageOption}>
+          <input type="radio" name="stage" value="Ready to book" data-stage="book" class="sr-only" />
+          Ready to book
+        </label>
+      </div>
+    </fieldset>
+
+    {
+      !tour && (
+        <div class="sm:col-span-2">
+          <label class={label} for={`${id}-tour`}>Tour</label>
+          <select class={field} id={`${id}-tour`} name="tour" data-tour>
+            <option value="Not decided yet">Not decided yet</option>
+            {tours.map((t) => (
+              <option value={t.data.title} data-slug={t.id}>
+                {t.data.title} ({t.data.durationDays} days)
+              </option>
+            ))}
+            <option value="Tailor-made safari">A tailor-made safari</option>
+          </select>
+        </div>
+      )
+    }
+
     <div class="sm:col-span-2">
-      <label class={label} for={`${id}-name`}>Full name *</label>
+      <label class={label} for={`${id}-name`} data-text-book="Full name (as in passport) *">Full name *</label>
       <input class={field} id={`${id}-name`} name="name" autocomplete="name" required />
     </div>
     <div>
@@ -53,24 +101,48 @@ const label = labelClass;
       <input class={field} id={`${id}-email`} name="email" type="email" autocomplete="email" required />
     </div>
     <div>
-      <label class={label} for={`${id}-phone`}>Phone / WhatsApp</label>
-      <input class={field} id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" />
+      <label class={label} for={`${id}-phone`} data-text-book="Phone / WhatsApp *">Phone / WhatsApp</label>
+      <input class={field} id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" data-required-book />
     </div>
     <div>
       <label class={label} for={`${id}-country`}>Country of residence</label>
       <input class={field} id={`${id}-country`} name="country" autocomplete="country-name" />
     </div>
-    <div>
+    <div data-only="book" hidden>
+      <label class={label} for={`${id}-nationality`}>Nationality</label>
+      <input class={field} id={`${id}-nationality`} name="nationality" />
+    </div>
+    <div data-only="explore">
       <label class={label} for={`${id}-date`}>Preferred travel month</label>
       <input class={field} id={`${id}-date`} name="travel_month" type="month" />
+    </div>
+    <div data-only="book" hidden>
+      <label class={label} for={`${id}-start`}>Preferred start date *</label>
+      <input class={field} id={`${id}-start`} name="start_date" type="date" required />
+    </div>
+    <div data-only="book" hidden>
+      <label class={label} for={`${id}-flex`}>How flexible are your dates?</label>
+      <select class={field} id={`${id}-flex`} name="date_flexibility">
+        <option>Fixed dates</option>
+        <option>Plus or minus a few days</option>
+        <option>Flexible within the month</option>
+      </select>
     </div>
     <div>
       <label class={label} for={`${id}-adults`}>Adults</label>
       <input class={field} id={`${id}-adults`} name="adults" type="number" min="1" value="2" inputmode="numeric" />
     </div>
     <div>
-      <label class={label} for={`${id}-children`}>Children</label>
+      <label class={label} for={`${id}-children`}>Children (under 16)</label>
       <input class={field} id={`${id}-children`} name="children" type="number" min="0" value="0" inputmode="numeric" />
+    </div>
+    <div data-only="book" hidden>
+      <label class={label} for={`${id}-ages`}>Children’s ages</label>
+      <input class={field} id={`${id}-ages`} name="children_ages" placeholder="e.g. 8, 12" />
+    </div>
+    <div data-only="book" hidden>
+      <label class={label} for={`${id}-rooms`}>Rooms</label>
+      <input class={field} id={`${id}-rooms`} name="rooms" placeholder="e.g. 1 double, 1 twin" />
     </div>
     <div class="sm:col-span-2">
       <label class={label} for={`${id}-type`}>Type of travel</label>
@@ -82,19 +154,72 @@ const label = labelClass;
         <option>Honeymoon</option>
       </select>
     </div>
+    <div class="sm:col-span-2" data-only="book" hidden>
+      <label class={label} for={`${id}-level`}>Accommodation level</label>
+      <select class={field} id={`${id}-level`} name="accommodation">
+        <option>As in the itinerary</option>
+        <option>Mid-range</option>
+        <option>Luxury</option>
+        <option>Not sure, please advise</option>
+      </select>
+    </div>
+    <div class="sm:col-span-2" data-only="book" hidden>
+      <label class={label} for={`${id}-flights`}>Arrival and departure flights (if booked)</label>
+      <input class={field} id={`${id}-flights`} name="flights" placeholder="Flight numbers, dates and times" />
+    </div>
     <div class="sm:col-span-2">
-      <label class={label} for={`${id}-message`}>Your ideas</label>
+      <label class={label} for={`${id}-message`} data-text-book="Special requests">Your ideas</label>
       <textarea
         class={field}
         id={`${id}-message`}
         name="message"
         rows="4"
-        placeholder="Places you'd like to see, budget, accommodation style, special occasions…"></textarea>
+        placeholder="Places you'd like to see, budget, accommodation style, special occasions…"
+        data-placeholder-book="Dietary needs, mobility, celebrations, extra nights, balloon safari…"></textarea>
+    </div>
+    <div class="sm:col-span-2" data-only="book" hidden>
+      <label class={label} for={`${id}-source`}>How did you hear about us?</label>
+      <select class={field} id={`${id}-source`} name="heard_from">
+        <option value="">Choose one</option>
+        <option>Tripadvisor</option>
+        <option>SafariBookings</option>
+        <option>Google</option>
+        <option>Facebook / Instagram</option>
+        <option>Friend or family</option>
+        <option>Travelled with you before</option>
+        <option>Other</option>
+      </select>
     </div>
 
+    <div class="rounded-md bg-mist-100 p-4 sm:col-span-2" data-only="book" hidden>
+      <p class="text-sm font-semibold">What happens next</p>
+      <ol class="mt-2 space-y-2">
+        {
+          steps.map((s, i) => (
+            <li class="flex gap-2 text-sm text-ink-700">
+              <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-moss-700 text-[0.7rem] font-bold text-white">
+                {i + 1}
+              </span>
+              {s}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <label class="flex items-start gap-3 text-sm text-ink-800 sm:col-span-2" data-only="book" hidden>
+      <input type="checkbox" name="confirm" value="Yes" required class="mt-0.5 size-4 accent-moss-700" data-label="Understands this is a booking request" />
+      <span>I understand this is a booking request. KSafaris will confirm availability, the final price and payment details before anything is booked. *</span>
+    </label>
+
     <div class="flex flex-col gap-3 sm:col-span-2">
-      <button type="submit" class="btn-primary w-full py-3 text-base">Send enquiry</button>
-      <a href={whatsappLink(waText)} target="_blank" rel="noopener" class="btn w-full border border-whatsapp py-3 text-whatsapp hover:bg-whatsapp/5">
+      <button type="submit" class="btn-primary w-full py-3 text-base" data-text-book="Send booking request">Send enquiry</button>
+      <a
+        href={whatsappLink(waExplore)}
+        data-href-book={whatsappLink(waBook)}
+        target="_blank"
+        rel="noopener"
+        class="btn w-full border border-whatsapp py-3 text-whatsapp hover:bg-whatsapp/5"
+      >
         <Icon name="whatsapp" class="size-5" />
         Or chat on WhatsApp
       </a>
@@ -105,5 +230,72 @@ const label = labelClass;
 
 <script>
   import { wireForms } from '../lib/forms';
-  wireForms('[data-enquiry-form]', 'Asante! Your enquiry has been sent. We’ll be in touch within one working day.');
+
+  type Stage = 'explore' | 'book';
+  const params = new URLSearchParams(window.location.search);
+
+  document.querySelectorAll<HTMLElement>('[data-plan]').forEach((root) => {
+    const form = root.querySelector<HTMLFormElement>('[data-enquiry-form]')!;
+    const subject = form.querySelector<HTMLInputElement>('[data-subject]')!;
+    const tour = form.querySelector<HTMLInputElement | HTMLSelectElement>('[data-tour]')!;
+    let stage: Stage = 'explore';
+
+    // Remember each element's starting text, placeholder and link so stages can swap back.
+    const keep = (el: HTMLElement, key: string, value: string) => (el.dataset[key] ??= value);
+
+    const updateSubject = () => {
+      const named = tour.value && tour.value !== 'Not decided yet' ? `: ${tour.value}` : '';
+      subject.value = `${stage === 'book' ? 'Booking request' : 'Safari enquiry'}${named}`;
+    };
+
+    const setStage = (next: Stage) => {
+      stage = next;
+      const book = next === 'book';
+      form.querySelector<HTMLInputElement>(`[data-stage="${next}"]`)!.checked = true;
+      root.querySelectorAll<HTMLElement>('[data-only]').forEach((el) => {
+        const on = el.dataset.only === next;
+        el.hidden = !on;
+        el.querySelectorAll<HTMLInputElement>('input, select, textarea').forEach((i) => (i.disabled = !on));
+      });
+      root.querySelectorAll<HTMLElement>('[data-text-book]').forEach((el) => {
+        const plain = keep(el, 'textExplore', el.textContent!.trim());
+        el.textContent = book ? el.dataset.textBook! : plain;
+      });
+      root.querySelectorAll<HTMLInputElement>('[data-placeholder-book]').forEach((el) => {
+        const plain = keep(el, 'placeholderExplore', el.placeholder);
+        el.placeholder = book ? el.dataset.placeholderBook! : plain;
+      });
+      root.querySelectorAll<HTMLAnchorElement>('[data-href-book]').forEach((el) => {
+        const plain = keep(el, 'hrefExplore', el.href);
+        el.href = book ? el.dataset.hrefBook! : plain;
+      });
+      root.querySelectorAll<HTMLInputElement>('[data-required-book]').forEach((el) => (el.required = book));
+      updateSubject();
+    };
+
+    form.querySelectorAll<HTMLInputElement>('[data-stage]').forEach((r) =>
+      r.addEventListener('change', () => setStage(r.dataset.stage as Stage)),
+    );
+    tour.addEventListener('change', updateSubject);
+    // After a successful send the form resets; stay on the stage the guest chose.
+    form.addEventListener('reset', () => setTimeout(() => setStage(stage)));
+
+    // Links such as "Book this safari" open the form on a stage.
+    document.querySelectorAll<HTMLElement>(`[data-set-stage][href="#${root.id}"]`).forEach((link) =>
+      link.addEventListener('click', () => setStage(link.dataset.setStage as Stage)),
+    );
+
+    // /contact?stage=book&tour=<slug>
+    if (tour instanceof HTMLSelectElement) {
+      const match = [...tour.options].find((o) => o.dataset.slug === params.get('tour'));
+      if (match) match.selected = true;
+    }
+    setStage(params.get('stage') === 'book' ? 'book' : 'explore');
+  });
+
+  wireForms('[data-enquiry-form]', (form) =>
+    (form.elements.namedItem('stage') as RadioNodeList).value === 'Ready to book'
+      ? 'Asante! Your booking request has been sent. We’ll confirm availability within one working day.'
+      : 'Asante! Your enquiry has been sent. We’ll be in touch within one working day.',
+  );
 </script>

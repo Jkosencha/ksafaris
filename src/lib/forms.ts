@@ -40,7 +40,7 @@ function summarise(form: HTMLFormElement, data: FormData) {
 }
 
 /** Send every form matching `selector` to the endpoint, or by email when none is set. */
-export function wireForms(selector: string, sentMessage: string) {
+export function wireForms(selector: string, sentMessage: string | ((form: HTMLFormElement) => string)) {
   document.querySelectorAll<HTMLFormElement>(selector).forEach((form) => {
     const status = form.querySelector<HTMLElement>('[data-form-status]')!;
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
@@ -66,9 +66,10 @@ export function wireForms(selector: string, sentMessage: string) {
       try {
         const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(String(res.status));
+        const message = typeof sentMessage === 'function' ? sentMessage(form) : sentMessage;
         form.reset();
         status.className = 'text-sm font-medium text-moss-700';
-        status.textContent = sentMessage;
+        status.textContent = message;
       } catch {
         status.className = 'text-sm font-medium text-moss-700';
         status.textContent = `Sorry, something went wrong. Please email ${email} or message us on WhatsApp.`;
