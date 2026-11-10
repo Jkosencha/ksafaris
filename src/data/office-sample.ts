@@ -91,3 +91,65 @@ export const MONTH_SUMMARY = [
   { value: '21%', label: 'Enquiries that booked' },
   { value: '3 h', label: 'Average first reply' },
 ];
+
+/** First day shown on the trips calendar (sample data is set around this date). */
+export const CALENDAR_START = '2026-11-10';
+
+export interface Trip {
+  guest: string;
+  tour: string;
+  photo: PhotoKey;
+  /** Day offset from CALENDAR_START, and length in days. */
+  start: number;
+  days: number;
+  status: 'paid' | 'awaiting' | 'noguide';
+  label: string;
+}
+
+export const TRIPS: Trip[] = [
+  { guest: 'Hassan couple (2)', tour: '17 Days Best of Kenya', photo: 'elephant', start: 0, days: 9, status: 'paid', label: 'Samuel · Land Cruiser 3 · on safari now' },
+  { guest: 'Okafor family (4)', tour: '10 Days Bush & Beach', photo: 'flamingos', start: 4, days: 10, status: 'paid', label: 'Joseph · Land Cruiser 2' },
+  { guest: 'Müller couple (2)', tour: '13 Days Kenya Tanzania', photo: 'ngorongoro', start: 8, days: 13, status: 'paid', label: 'Peter · fly-in' },
+  { guest: 'Grace Wanjiru (3)', tour: 'Amboseli weekend', photo: 'lion', start: 18, days: 3, status: 'awaiting', label: 'Joseph · LC 1' },
+  { guest: 'Lindqvist group (6)', tour: 'Tailor-made: Maasai Mara', photo: 'mara', start: 21, days: 5, status: 'noguide', label: 'Guide needed · balance due' },
+];
+
+export const TRIP_STATS: { value: string; label: string; tone: Tone }[] = [
+  { value: '1 trip', label: 'On safari now, 2 guests', tone: 'leaf' },
+  { value: '2', label: 'Departing in the next 10 days', tone: 'teal' },
+  { value: '$18,080', label: 'Payments due this month', tone: 'clay' },
+  { value: '2 of 4', label: 'Guides free today', tone: 'gold' },
+];
+
+/** Status lines for the guides, vehicles and payments panels. `tone` marks the ones to notice. */
+export const RESOURCES: { title: string; tone: Tone; rows: { name: string; status: string; tone?: Tone }[] }[] = [
+  {
+    title: 'Guides',
+    tone: 'teal',
+    rows: [
+      { name: 'Joseph', status: 'Free until 14 Nov', tone: 'leaf' },
+      { name: 'Peter', status: 'Free until 18 Nov', tone: 'leaf' },
+      { name: 'Samuel', status: 'On safari to 18 Nov' },
+      { name: 'Mary', status: 'On leave to 1 Dec' },
+    ],
+  },
+  {
+    title: 'Vehicles',
+    tone: 'gold',
+    rows: [
+      { name: 'Land Cruiser 1', status: 'Free', tone: 'leaf' },
+      { name: 'Land Cruiser 2', status: 'Booked from 14 Nov' },
+      { name: 'Land Cruiser 3', status: 'On safari to 18 Nov' },
+      { name: 'Land Cruiser 4', status: 'Service due 15 Nov', tone: 'clay' },
+    ],
+  },
+  {
+    title: 'Payments due',
+    tone: 'clay',
+    rows: [
+      { name: 'Grace Wanjiru', status: '$1,950 by 21 Nov', tone: 'gold' },
+      { name: 'Lindqvist group', status: '$12,350 by 24 Nov', tone: 'gold' },
+      { name: 'Okoro family', status: 'Deposit $3,780 now', tone: 'clay' },
+    ],
+  },
+];
