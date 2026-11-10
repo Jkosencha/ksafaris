@@ -1,0 +1,247 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import OfficeLayout from '../../../layouts/OfficeLayout.astro';
+import StagePill from '../../../components/office/StagePill.astro';
+import { PHOTOS, TONE } from '../../../lib/office';
+import { BOOKINGS, STAGES, type Booking, type Stage } from '../../../data/office-sample';
+
+export const getStaticPaths = (() => BOOKINGS.map((b) => ({ params: { id: b.id }, props: { b } }))) satisfies GetStaticPaths;
+
+interface Props {
+  b: Booking;
+}
+const { b } = Astro.props;
+const first = b.guest.split(' ')[0];
+
+// The steps a booking moves through, and where this one is.
+const order: Stage[] = ['new', 'quoted', 'awaiting', 'confirmed', 'completed'];
+const current = order.indexOf(b.stage === 'paid' ? 'confirmed' : b.stage);
+const confirmed = current >= 3;
+
+// SAMPLE DETAIL: shared made-up details until the database stores them per booking.
+const facts = [
+  { k: 'Start', v: b.start },
+  { k: 'Dates', v: 'Fixed' },
+  { k: 'Travellers', v: b.pax },
+  { k: 'Rooms', v: '1 double' },
+  { k: 'Accommodation', v: 'As in the itinerary' },
+  { k: 'Flights', v: 'Not booked yet' },
+];
+const quote = [
+  { item: b.tour, note: 'Private 4x4, lodges as itinerary, full board', qty: '1', total: b.value },
+  { item: 'Hot-air balloon, Maasai Mara', note: 'Optional, guest to confirm', qty: '2', total: '$960' },
+];
+const log = [
+  { who: 'Kevin', kind: 'Team note', when: '10 min ago', note: true, text: 'Checking lodge space for these dates before I quote.' },
+  { who: b.guest, kind: `${b.kind === 'Booking' ? 'Booking request' : 'Enquiry'} from the website`, when: b.received, note: false, text: `${b.tour}, starting ${b.start}, ${b.pax}. Heard about you on Tripadvisor.` },
+];
+const guest = [
+  { k: 'Email', v: `${first.toLowerCase()}@example.com` },
+  { k: 'Phone', v: '+44 7700 900123' },
+  { k: 'Lives in', v: b.country },
+  { k: 'Heard from', v: 'Tripadvisor' },
+  { k: 'Past trips', v: 'None yet' },
+];
+const select = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-surface px-2.5 text-[15px] text-o-text disabled:border-o-line disabled:bg-o-surface2 disabled:text-o-muted';
+const sectionTitle = 'font-display text-xl';
+---
+
+<OfficeLayout title={`${b.guest} · ${b.id}`}>
+  <nav aria-label="Breadcrumb" class="-mb-3 text-sm text-o-muted">
+    <a href="/office/bookings" class="text-o-link">Bookings</a> / {b.guest}
+  </nav>
+
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="font-display text-[34px] uppercase">{b.guest}</h1>
+        <StagePill stage={b.stage} />
+        <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', b.kind === 'Booking' ? TONE.clay.chip : 'bg-o-surface text-o-soft']}>
+          {b.kind === 'Booking' ? 'Booking request' : 'Enquiry'}
+        </span>
+      </div>
+      <p class="mt-1.5 text-sm text-o-muted">Received {b.received} from the website · Ref {b.id}</p>
+    </div>
+    <div class="flex flex-wrap gap-2.5">
+      <a href="#" class="flex min-h-11 items-center rounded-full bg-leaf-soft px-4 text-sm font-bold text-leaf-ink">WhatsApp</a>
+      <a href="#message" class="flex min-h-11 items-center rounded-full bg-o-surface px-4 text-sm font-bold text-o-text">Email guest</a>
+      <button type="button" class="min-h-11 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Send quote</button>
+    </div>
+  </div>
+
+  <ol aria-label="Booking stage" class="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+    {
+      order.map((s, i) => (
+        <li
+          aria-current={i === current ? 'step' : undefined}
+          class:list={['rounded-xl px-3.5 py-2.5 text-sm font-bold', i === current ? TONE[STAGES[s].tone].solid : TONE[STAGES[s].tone].card, i > current && 'opacity-60']}
+        >
+          <span class="block text-[11px] tracking-wider uppercase">Step {i + 1}</span>
+          {STAGES[s].label}
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="flex flex-wrap items-start gap-6">
+    <div class="flex min-w-0 flex-[999_1_560px] flex-col gap-5">
+      <section aria-labelledby="trip" class="rounded-xl bg-o-surface p-5 sm:p-6">
+        <div class="flex items-baseline justify-between gap-3">
+          <h2 id="trip" class={sectionTitle}>The trip</h2>
+          <a href="#" class="text-sm font-bold text-o-link">Edit</a>
+        </div>
+        <div class="relative isolate mt-3.5 mb-4.5 h-48 overflow-hidden rounded-xl">
+          <Image src={PHOTOS[b.photo]} alt="" widths={[640, 1200]} sizes="(min-width: 1024px) 800px, 100vw" class="absolute inset-0 -z-10 size-full object-cover" />
+          <p class="absolute inset-x-0 bottom-0 bg-[#121610]/55 px-4.5 py-3.5 text-[19px] font-bold text-white">{b.tour}</p>
+        </div>
+        <dl class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-x-6 gap-y-4">
+          {
+            facts.map((f) => (
+              <div>
+                <dt class="text-xs tracking-wider text-o-muted uppercase">{f.k}</dt>
+                <dd class="mt-1 text-[15px]">{f.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="mt-4.5 rounded-lg bg-gold-soft px-4 py-3.5 text-sm text-gold-ink">
+          <p class="mb-1 text-xs font-bold tracking-wider uppercase">Special requests</p>
+          Vegetarian meals for both of us. It is a 40th birthday during the trip, anything special would be lovely.
+        </div>
+      </section>
+
+      <section aria-labelledby="quote" class="rounded-xl bg-o-surface p-5 sm:p-6">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 id="quote" class={sectionTitle}>Quote</h2>
+          <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.gold.chip]}>Draft, not sent yet</span>
+        </div>
+        <div class="mt-3 overflow-x-auto">
+          <table class="w-full min-w-[440px] text-sm">
+            <thead>
+              <tr class="text-left text-xs tracking-wider text-o-muted uppercase">
+                <th class="py-2 font-semibold">Item</th>
+                <th class="px-2 py-2 text-right font-semibold">Qty</th>
+                <th class="py-2 text-right font-semibold">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                quote.map((q) => (
+                  <tr class="border-t border-o-line">
+                    <td class="py-3">
+                      {q.item}
+                      <span class="block text-xs text-o-muted">{q.note}</span>
+                    </td>
+                    <td class="px-2 py-3 text-right">{q.qty}</td>
+                    <td class="py-3 text-right font-bold tabular-nums">{q.total}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-sm text-o-muted">Deposit and payment terms to confirm with KSafaris.</p>
+        <div class="mt-4 flex flex-wrap gap-2.5">
+          <button type="button" class="min-h-11 rounded-full border border-dashed border-teal px-4 text-sm font-bold text-teal-ink">+ Add item</button>
+          <button type="button" class="min-h-11 rounded-full bg-o-surface2 px-4 text-sm font-bold text-o-text">Preview PDF</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="log" class="flex flex-col gap-3.5 rounded-xl bg-o-surface p-5 sm:p-6">
+        <h2 id="log" class={sectionTitle}>Messages and notes</h2>
+        <form id="message" class="flex flex-col gap-2.5 rounded-lg bg-o-surface2 p-3" data-message-form>
+          <div role="group" aria-label="Message type" class="flex gap-1.5">
+            <button type="button" data-mode="email" aria-pressed="true" class="min-h-9 rounded-full bg-o-surface px-3.5 text-[13px] font-bold text-o-text aria-pressed:bg-teal aria-pressed:text-[#0e1d1e]">Email {first}</button>
+            <button type="button" data-mode="note" aria-pressed="false" class="min-h-9 rounded-full bg-o-surface px-3.5 text-[13px] font-bold text-o-text aria-pressed:bg-gold aria-pressed:text-[#2b2208]">Note for the team</button>
+          </div>
+          <label class="text-[13px] text-o-muted">
+            <span data-label>Message to {first}</span>
+            <textarea rows="3" placeholder={`Jambo ${first}, thank you for choosing KSafaris…`} class="mt-1 block w-full resize-y rounded-md bg-o-surface p-2.5 text-[15px] text-o-text placeholder:text-o-muted"></textarea>
+          </label>
+          <div class="flex justify-end"><button type="submit" class="min-h-10 rounded-full bg-teal px-4.5 text-sm font-bold text-[#0e1d1e]" data-send>Send</button></div>
+        </form>
+        <ol class="flex flex-col gap-3">
+          {
+            log.map((m) => (
+              <li class="flex gap-3">
+                <span aria-hidden="true" class:list={['flex size-8.5 shrink-0 items-center justify-center rounded-full text-sm font-bold', m.note ? TONE.gold.chip : TONE.teal.chip]}>
+                  {m.who.charAt(0)}
+                </span>
+                <div class="flex min-w-0 flex-col gap-1">
+                  <span class="text-[13px]">
+                    <span class="font-bold">{m.who}</span> <span class="text-o-muted">· {m.kind} · {m.when}</span>
+                  </span>
+                  <span class:list={['text-sm leading-relaxed', m.note ? ['rounded-lg px-3 py-2', TONE.gold.chip] : 'text-o-soft']}>{m.text}</span>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+    </div>
+
+    <aside class="flex flex-[1_1_300px] flex-col gap-5">
+      <section aria-labelledby="guest" class:list={['rounded-xl p-5', TONE.teal.card]}>
+        <h2 id="guest" class={sectionTitle}>Lead guest</h2>
+        <dl class="mt-3 flex flex-col gap-2.5 text-sm">
+          {
+            guest.map((g) => (
+              <div class="flex justify-between gap-3">
+                <dt class="opacity-80">{g.k}</dt>
+                <dd class="text-right font-semibold break-all">{g.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <a href="/office/guests" class="mt-3.5 inline-block text-sm font-bold text-inherit">Open guest profile</a>
+      </section>
+
+      <section aria-labelledby="team" class:list={['flex flex-col gap-3 rounded-xl p-5', TONE.gold.card]}>
+        <h2 id="team" class={sectionTitle}>Team</h2>
+        <label class="text-[13px]">Handled by
+          <select class={select}>
+            {['Unassigned', 'Kevin', 'Amina'].map((n) => <option selected={n === b.owner}>{n}</option>)}
+          </select>
+        </label>
+        <label class="text-[13px]">Guide
+          <select class={select} disabled={!confirmed}>
+            {confirmed ? ['Joseph', 'Peter', 'Samuel', 'Mary'].map((n) => <option>{n}</option>) : <option>Assign once confirmed</option>}
+          </select>
+        </label>
+        <label class="text-[13px]">Vehicle
+          <select class={select} disabled={!confirmed}>
+            {confirmed ? ['Land Cruiser 1', 'Land Cruiser 2', 'Land Cruiser 3', 'Land Cruiser 4'].map((n) => <option>{n}</option>) : <option>Assign once confirmed</option>}
+          </select>
+        </label>
+      </section>
+
+      <section aria-labelledby="pay" class:list={['flex flex-col gap-3 rounded-xl p-5', TONE.clay.card]}>
+        <h2 id="pay" class={sectionTitle}>Payments</h2>
+        <ul class="flex flex-col gap-2.5 text-sm">
+          <li class="flex justify-between gap-3"><span>Deposit</span><span class="font-bold">{b.stage === 'paid' ? 'Received' : b.stage === 'awaiting' ? 'Requested, not received' : 'Not requested'}</span></li>
+          <li class="flex justify-between gap-3"><span>Balance</span><span class="font-bold">{b.stage === 'paid' ? 'Received' : 'Due before travel'}</span></li>
+        </ul>
+        <p class="text-[13px]">Payment methods and terms to confirm with KSafaris.</p>
+      </section>
+    </aside>
+  </div>
+</OfficeLayout>
+
+<script>
+  // Switch the message box between an email to the guest and a note for the team.
+  document.querySelectorAll<HTMLFormElement>('[data-message-form]').forEach((form) => {
+    const label = form.querySelector('[data-label]')!;
+    const send = form.querySelector('[data-send]')!;
+    const toGuest = label.textContent ?? '';
+    form.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((button) =>
+      button.addEventListener('click', () => {
+        const note = button.dataset.mode === 'note';
+        form.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        label.textContent = note ? 'Note only the team can see' : toGuest;
+        send.textContent = note ? 'Save note' : 'Send';
+      }),
+    );
+    form.addEventListener('submit', (e) => e.preventDefault()); // Sending arrives with the database.
+  });
+</script>
