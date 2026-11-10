@@ -1,0 +1,190 @@
+---
+import { Image } from 'astro:assets';
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { PHOTOS, TONE } from '../../lib/office';
+import { GUESTS, GUEST_PROFILE as P, type Tone } from '../../data/office-sample';
+
+const TOTAL = 214; // sample: guests on file
+const filters = [
+  { key: 'all', label: `All ${TOTAL}` },
+  { key: 'soon', label: 'Travelling soon' },
+  { key: 'repeat', label: 'Repeat guests' },
+  { key: 'never', label: 'Enquired, never booked' },
+  { key: 'reviewed', label: 'Left a review' },
+];
+const avatarTones: Tone[] = ['leaf', 'teal', 'gold', 'clay'];
+---
+
+<OfficeLayout title="Guests">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-[34px] uppercase">Guests</h1>
+      <p class="mt-1.5 text-[15px] text-o-muted">Everyone who has enquired or travelled with you, with their trips, preferences and notes in one place.</p>
+    </div>
+    <label class="flex h-11 min-w-72 items-center gap-2 rounded-full bg-o-surface px-3.5 text-sm text-o-muted">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input type="search" data-guest-search aria-label="Search guests" placeholder="Search by name or country" class="w-full bg-transparent text-o-text outline-none placeholder:text-o-muted" />
+    </label>
+  </div>
+
+  <div role="group" aria-label="Show" class="-mt-2 flex flex-wrap gap-2">
+    {
+      filters.map((f, i) => (
+        <button
+          type="button"
+          data-group={f.key}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          class="min-h-11 rounded-full bg-o-surface px-4 text-sm font-semibold text-o-text aria-pressed:bg-teal aria-pressed:text-[#0e1d1e]"
+        >
+          {f.label}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="flex flex-wrap items-start gap-6">
+    <section aria-label="Guest list" class="min-w-0 flex-[999_1_560px] overflow-hidden rounded-xl bg-o-surface">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr class="text-left text-xs tracking-wider text-o-muted uppercase">
+              <th class="px-5 py-3.5 font-semibold">Guest</th>
+              <th class="px-2 py-3.5 font-semibold">Trips</th>
+              <th class="px-2 py-3.5 font-semibold">Next or last trip</th>
+              <th class="px-2 py-3.5 text-right font-semibold">Total spent</th>
+              <th class="px-5 py-3.5 font-semibold">Tags</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              GUESTS.map((g, i) => (
+                <tr
+                  data-guest
+                  data-groups={g.groups.join(' ')}
+                  data-text={`${g.name} ${g.country}`.toLowerCase()}
+                  class:list={[i === 0 ? TONE.leaf.card : '']}
+                  aria-current={i === 0 ? 'true' : undefined}
+                >
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-3">
+                      <span aria-hidden="true" class:list={['flex size-8.5 shrink-0 items-center justify-center rounded-full text-sm font-bold', TONE[avatarTones[i % 4]].chip]}>
+                        {g.name.charAt(0)}
+                      </span>
+                      <span>
+                        <span class="block font-bold">{g.name}</span>
+                        <span class="text-xs opacity-75">{g.country}</span>
+                      </span>
+                    </span>
+                  </td>
+                  <td class="px-2 py-3">{g.trips}</td>
+                  <td class="px-2 py-3">
+                    <span class="block">{g.trip}</span>
+                    <span class="text-xs opacity-75">{g.when}</span>
+                  </td>
+                  <td class="px-2 py-3 text-right font-semibold tabular-nums">{g.spent}</td>
+                  <td class="px-5 py-3">
+                    <span class="flex flex-wrap gap-1">
+                      {g.tags.map((t) => (
+                        <span class:list={['rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap', TONE[t.tone].chip]}>{t.label}</span>
+                      ))}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="px-5 py-3.5 text-[13px] text-o-muted" data-guest-count>Showing {GUESTS.length} of {TOTAL} guests</p>
+    </section>
+
+    <aside aria-labelledby="profile" class="flex flex-[1_1_340px] flex-col gap-4">
+      <section class:list={['flex flex-col gap-3.5 rounded-xl p-5', TONE.leaf.card]}>
+        <div class="flex items-center gap-3.5">
+          <span aria-hidden="true" class:list={['flex size-14 items-center justify-center rounded-full font-display text-2xl', TONE.leaf.solid]}>{P.name.charAt(0)}</span>
+          <div>
+            <h2 id="profile" class="font-display text-2xl">{P.name}</h2>
+            <p class="mt-0.5 text-sm">{P.since}</p>
+          </div>
+        </div>
+        <dl class="grid grid-cols-3 gap-2">
+          {
+            P.stats.map((s) => (
+              <div class="flex flex-col-reverse rounded-lg bg-o-surface px-3 py-2.5 text-o-text">
+                <dt class="text-xs text-o-muted">{s.label}</dt>
+                <dd class="text-[22px] font-bold">{s.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="flex flex-wrap gap-2">
+          <a href="#" class="flex min-h-10 items-center rounded-full bg-o-surface px-3.5 text-[13px] font-bold text-o-text">Email</a>
+          <a href="#" class="flex min-h-10 items-center rounded-full bg-o-surface px-3.5 text-[13px] font-bold text-o-text">WhatsApp</a>
+          <a href="/office/bookings/new" class:list={['flex min-h-10 items-center rounded-full px-3.5 text-[13px] font-bold', TONE.leaf.solid]}>New booking for {P.name.split(' ')[0]}</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="prefs" class:list={['flex flex-col gap-2.5 rounded-xl p-5', TONE.gold.card]}>
+        <h3 id="prefs" class="font-display text-lg uppercase">Good to know</h3>
+        <dl class="flex flex-col gap-2 text-sm">
+          {
+            P.prefs.map((p) => (
+              <div class="flex gap-2.5">
+                <dt class="w-24 shrink-0 font-bold">{p.k}</dt>
+                <dd>{p.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+
+      <section aria-labelledby="history" class="flex flex-col gap-2.5 rounded-xl bg-o-surface p-5">
+        <h3 id="history" class="font-display text-lg uppercase">Trips</h3>
+        <ol class="flex flex-col gap-2">
+          {
+            P.history.map((h) => (
+              <li class:list={['flex items-center gap-3 rounded-lg p-2.5', TONE[h.tone].card]}>
+                <Image src={PHOTOS[h.photo]} alt="" width={112} height={88} class="h-11 w-14 shrink-0 rounded-md object-cover" />
+                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span class="text-sm font-bold">{h.tour}</span>
+                  <span class="text-xs">{h.when}</span>
+                </span>
+                <span class="text-xs font-bold whitespace-nowrap">{h.status}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+    </aside>
+  </div>
+</OfficeLayout>
+
+<script>
+  // Filter the guest list by group and by the search box together.
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>('[data-guest]')];
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-group]');
+  const search = document.querySelector<HTMLInputElement>('[data-guest-search]')!;
+  const count = document.querySelector('[data-guest-count]')!;
+  let group = 'all';
+
+  const apply = () => {
+    const q = search.value.trim().toLowerCase();
+    let shown = 0;
+    rows.forEach((row) => {
+      const inGroup = group === 'all' || (row.dataset.groups ?? '').split(' ').includes(group);
+      const matches = !q || (row.dataset.text ?? '').includes(q);
+      row.hidden = !(inGroup && matches);
+      if (!row.hidden) shown++;
+    });
+    count.textContent = `Showing ${shown} guest${shown === 1 ? '' : 's'}`;
+  };
+
+  buttons.forEach((button) =>
+    button.addEventListener('click', () => {
+      group = button.dataset.group ?? 'all';
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+      apply();
+    }),
+  );
+  search.addEventListener('input', apply);
+</script>

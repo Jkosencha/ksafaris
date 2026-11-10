@@ -153,3 +153,48 @@ export const RESOURCES: { title: string; tone: Tone; rows: { name: string; statu
     ],
   },
 ];
+
+export interface Guest {
+  name: string;
+  country: string;
+  trips: number;
+  trip: string;
+  when: string;
+  spent: string;
+  tags: { label: string; tone: Tone }[];
+  /** Which filter buttons this guest matches. */
+  groups: ('soon' | 'repeat' | 'never' | 'reviewed')[];
+}
+
+export const GUESTS: Guest[] = [
+  { name: 'Laura Price', country: 'United States', trips: 3, trip: '17 Days Best of Kenya', when: 'Departs 12 Dec', spent: '$38,900', tags: [{ label: 'Repeat', tone: 'leaf' }, { label: 'Family', tone: 'teal' }], groups: ['soon', 'repeat', 'reviewed'] },
+  { name: 'Sarah Mitchell', country: 'United Kingdom', trips: 0, trip: '17 Days Best of Kenya', when: 'Requested for 14 Feb', spent: '$0', tags: [{ label: 'New', tone: 'teal' }], groups: ['never'] },
+  { name: 'Hassan couple', country: 'United Arab Emirates', trips: 2, trip: '17 Days Best of Kenya', when: 'On safari now', spent: '$24,600', tags: [{ label: 'Repeat', tone: 'leaf' }, { label: 'Honeymoon', tone: 'gold' }], groups: ['repeat', 'reviewed'] },
+  { name: 'Okafor family', country: 'Nigeria', trips: 1, trip: '10 Days Bush & Beach', when: 'Departs 14 Nov', spent: '$12,600', tags: [{ label: 'Family', tone: 'teal' }], groups: ['soon'] },
+  { name: 'Aiko Tanaka', country: 'Japan', trips: 1, trip: 'Tailor-made: Rwanda', when: 'Departs 20 Jan', spent: '$4,900', tags: [{ label: 'Solo', tone: 'gold' }], groups: [] },
+  { name: 'Grace Wanjiru', country: 'Kenya', trips: 4, trip: 'Amboseli weekend', when: 'Departs 28 Nov', spent: '$7,300', tags: [{ label: 'Repeat', tone: 'leaf' }, { label: 'Resident rate', tone: 'clay' }], groups: ['soon', 'repeat', 'reviewed'] },
+  { name: 'Thomas Becker', country: 'Germany', trips: 0, trip: '10 Days Bush & Beach', when: 'Quoted 9 Nov', spent: '$0', tags: [{ label: 'Quoted', tone: 'gold' }], groups: ['never'] },
+  { name: 'Müller couple', country: 'Germany', trips: 1, trip: '13 Days Kenya Tanzania', when: 'Departs 18 Nov', spent: '$19,800', tags: [{ label: 'Fly-in', tone: 'teal' }], groups: ['soon'] },
+];
+
+export const GUEST_PROFILE = {
+  name: 'Laura Price',
+  since: 'United States · guest since 2023',
+  stats: [
+    { value: '3', label: 'Trips' },
+    { value: '$38.9k', label: 'Spent' },
+    { value: '5★', label: 'Review' },
+  ],
+  prefs: [
+    { k: 'Food', v: 'One child is vegetarian; no nuts for her son' },
+    { k: 'Rooms', v: 'Family tent or two connecting rooms' },
+    { k: 'Loves', v: 'Big cats, photography, sundowners' },
+    { k: 'Guide', v: 'Asked for Joseph again' },
+    { k: 'Dates', v: 'Wedding anniversary 18 Dec' },
+  ],
+  history: [
+    { tour: '17 Days Best of Kenya Safaris', when: '12 to 28 Dec 2026 · 5 guests', status: 'Confirmed', tone: 'teal' as Tone, photo: 'elephant' as PhotoKey },
+    { tour: 'Tailor-made: Maasai Mara & Diani', when: 'Aug 2025 · 4 guests', status: 'Completed', tone: 'leaf' as Tone, photo: 'mara' as PhotoKey },
+    { tour: 'Amboseli & Tsavo', when: 'Mar 2023 · 2 guests', status: 'Completed', tone: 'leaf' as Tone, photo: 'lion' as PhotoKey },
+  ],
+};
