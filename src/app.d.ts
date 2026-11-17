@@ -11,8 +11,8 @@ interface ImportMetaEnv {
 declare namespace App {
   interface Locals {
     /** The signed-in staff member, on dashboard pages. */
-    staff?: { id: string; name: string; role: 'admin' | 'staff' };
-    /** True when the dashboard runs locally without Supabase keys (sample data only). */
+    user?: import('./lib/auth/session').SessionUser;
+    /** True when the dashboard runs locally without a database (sample data only). */
     officePreview?: boolean;
   }
 }

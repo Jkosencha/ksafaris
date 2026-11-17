@@ -1,6 +1,7 @@
-// Locks the staff dashboard (/office) behind a Supabase sign-in.
+// Locks the staff dashboard (/office) behind our own sign-in.
 import { defineMiddleware } from 'astro:middleware';
-import { isSupabaseConfigured, supabaseForRequest } from './lib/supabase';
+import { db, isDatabaseConfigured } from './lib/db/client';
+import { SESSION_COOKIE, clearSessionCookie, setSessionCookie, validateSession } from './lib/auth/session';
 
 const LOGIN = '/office/login';
 
@@ -9,9 +10,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isOffice = pathname === '/office' || pathname.startsWith('/office/');
   if (!isOffice || context.isPrerendered || pathname.startsWith(LOGIN)) return next();
 
-  if (!isSupabaseConfigured) {
+  if (!isDatabaseConfigured) {
     // On this computer, while building it, show the sample dashboard with a notice.
-    // A published site without keys stays locked.
+    // A published site without a database stays locked.
     if (import.meta.env.DEV) {
       context.locals.officePreview = true;
       return next();
@@ -19,19 +20,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return context.redirect(`${LOGIN}?error=setup`);
   }
 
-  const supabase = supabaseForRequest(context.request, context.cookies);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return context.redirect(`${LOGIN}?next=${encodeURIComponent(pathname)}`);
-
-  // Signed in is not enough: they must be on the staff list.
-  const { data: staff } = await supabase.from('staff').select('id, name, role').eq('id', user.id).maybeSingle();
-  if (!staff) {
-    await supabase.auth.signOut();
-    return context.redirect(`${LOGIN}?error=notstaff`);
+  const secure = import.meta.env.PROD;
+  const token = context.cookies.get(SESSION_COOKIE)?.value;
+  const session = token ? await validateSession(db(), token) : null;
+  if (!session) {
+    if (token) clearSessionCookie(context.cookies, secure);
+    return context.redirect(`${LOGIN}?next=${encodeURIComponent(pathname)}`);
   }
 
-  context.locals.staff = staff as App.Locals['staff'];
+  if (session.renewedUntil && token) setSessionCookie(context.cookies, token, session.renewedUntil, secure);
+  context.locals.user = session.user;
   return next();
 });

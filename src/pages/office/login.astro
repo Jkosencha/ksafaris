@@ -3,7 +3,10 @@
 import '../../styles/global.css';
 import { Image } from 'astro:assets';
 import { PHOTOS } from '../../lib/office';
-import { isSupabaseConfigured, supabaseForRequest } from '../../lib/supabase';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { attemptLogin } from '../../lib/auth/login';
+import { clientIp } from '../../lib/auth/request';
+import { setSessionCookie } from '../../lib/auth/session';
 
 export const prerender = false;
 
@@ -13,24 +16,31 @@ const next = nextParam.startsWith('/office') && !nextParam.startsWith('//') ? ne
 
 const messages: Record<string, string> = {
   setup: 'The dashboard is not connected to its database yet.',
-  notstaff: 'That account is not on the staff list. Ask the office admin to add you.',
-  wrong: 'That email and password do not match. Try again.',
+  wrong: 'That email and password do not match, or the account is switched off. Try again or ask the office admin.',
+  limited: 'Too many attempts. Wait 15 minutes, then try again.',
   missing: 'Enter your email and password.',
 };
 let error = Astro.url.searchParams.get('error') ?? '';
 let email = '';
 
-if (Astro.request.method === 'POST' && isSupabaseConfigured) {
+if (Astro.request.method === 'POST' && isDatabaseConfigured) {
   const form = await Astro.request.formData();
-  email = String(form.get('email') ?? '').trim();
-  const password = String(form.get('password') ?? '');
+  email = String(form.get('email') ?? '').trim().slice(0, 200);
+  const password = String(form.get('password') ?? '').slice(0, 500);
   if (!email || !password) {
     error = 'missing';
   } else {
-    const supabase = supabaseForRequest(Astro.request, Astro.cookies);
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (!signInError) return Astro.redirect(next, 303);
-    error = 'wrong';
+    const result = await attemptLogin(db(), {
+      email,
+      password,
+      ipAddress: clientIp(Astro.request, Astro.clientAddress),
+      userAgent: Astro.request.headers.get('user-agent') ?? undefined,
+    });
+    if (result.ok) {
+      setSessionCookie(Astro.cookies, result.token, result.expiresAt, import.meta.env.PROD);
+      return Astro.redirect(next, 303);
+    }
+    error = result.reason === 'limited' ? 'limited' : 'wrong';
   }
 }
 
@@ -77,7 +87,7 @@ const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-
           )
         }
         {
-          !isSupabaseConfigured && !error && (
+          !isDatabaseConfigured && !error && (
             <p class="rounded-lg bg-gold-soft px-3.5 py-2.5 text-sm text-gold-ink">
               Sign-in will work once the database is connected. While building on this computer, the dashboard is open with sample data:{' '}
               <a href="/office" class="font-bold underline">open it</a>.
@@ -92,7 +102,7 @@ const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-
           Password
           <input name="password" type="password" autocomplete="current-password" required class={field} />
         </label>
-        <button type="submit" disabled={!isSupabaseConfigured} class="min-h-11 rounded-full bg-teal font-bold text-[#0e1d1e] disabled:opacity-50">Sign in</button>
+        <button type="submit" disabled={!isDatabaseConfigured} class="min-h-11 rounded-full bg-teal font-bold text-[#0e1d1e] disabled:opacity-50">Sign in</button>
         <p class="text-center text-xs text-o-muted">Forgotten your password? Ask the office admin to reset it.</p>
       </form>
     </main>

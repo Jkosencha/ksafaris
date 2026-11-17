@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const person = Astro.locals.staff ?? { name: STAFF.name };
+const person = Astro.locals.user ?? { name: STAFF.name };
 const preview = Astro.locals.officePreview;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => (href === '/office' ? path === '/office' : path.startsWith(href));
@@ -101,7 +101,7 @@ const isActive = (href: string) => (href === '/office' ? path === '/office' : pa
     {
       preview && (
         <p class="bg-gold-soft px-4 py-2 text-center text-sm text-gold-ink">
-          <b>Preview on this computer:</b> sample data only, not connected to the database. Sign-in is switched on once the Supabase keys are added.
+          <b>Preview on this computer:</b> sample data only, not connected to the database. Sign-in is switched on once the database is connected.
         </p>
       )
     }
