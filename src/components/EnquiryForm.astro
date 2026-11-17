@@ -21,7 +21,6 @@ const { tour, id = 'plan' } = Astro.props;
 
 const tours = tour ? [] : (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
 const endpoint = FORM_ENDPOINT;
-const action = endpoint || `mailto:${CONTACT.email}`;
 const waExplore = tour
   ? `Hello KSafaris, I'm interested in the "${tour}" tour.`
   : 'Hello KSafaris, I would like to plan a safari.';
@@ -49,8 +48,7 @@ const stageOption =
   <form
     class="mt-5 grid gap-4 sm:grid-cols-2"
     method="post"
-    action={action}
-    enctype={endpoint ? undefined : 'text/plain'}
+    action={endpoint}
     data-enquiry-form
     data-endpoint={endpoint}
     data-email={CONTACT.email}

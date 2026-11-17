@@ -5,14 +5,12 @@ export const fieldClass =
 export const labelClass = 'block text-sm font-medium text-ink-800';
 
 /**
- * Where submissions go:
- * 1. PUBLIC_ENQUIRY_ENDPOINT, if set (an outside form service), otherwise
- * 2. the site's own /api/enquiry, which saves into the dashboard, once Supabase is set up, otherwise
- * 3. nothing: forms open a pre-filled email to the office.
+ * Where submissions go: an outside form service if PUBLIC_ENQUIRY_ENDPOINT is
+ * set, otherwise the site's own /api/enquiry, which saves into the dashboard.
+ * If the database is not connected yet, the endpoint says so and the form
+ * opens a pre-filled email instead.
  */
-const supabaseReady = Boolean(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
-export const FORM_ENDPOINT =
-  (import.meta.env.PUBLIC_ENQUIRY_ENDPOINT as string | undefined) || (supabaseReady ? '/api/enquiry' : '');
+export const FORM_ENDPOINT = (import.meta.env.PUBLIC_ENQUIRY_ENDPOINT as string | undefined) || '/api/enquiry';
 
 const SKIP = new Set(['website', 'subject']);
 
@@ -55,20 +53,22 @@ export function wireForms(selector: string, sentMessage: string | ((form: HTMLFo
       const data = new FormData(form);
       if (data.get('website')) return; // honeypot
 
-      const endpoint = form.dataset.endpoint;
-      if (!endpoint) {
+      const byEmail = () => {
         const subject = String(data.get('subject') ?? 'Safari enquiry');
         window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summarise(form, data))}`;
         status.className = 'text-sm text-ink-700';
         status.textContent = 'Your email app should open with your details ready to send.';
-        return;
-      }
+      };
+
+      const endpoint = form.dataset.endpoint;
+      if (!endpoint) return byEmail();
 
       button.disabled = true;
       status.className = 'text-sm text-ink-700';
       status.textContent = 'Sending…';
       try {
         const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (res.status === 503) return byEmail(); // database not connected yet
         if (!res.ok) throw new Error(String(res.status));
         const message = typeof sentMessage === 'function' ? sentMessage(form) : sentMessage;
         form.reset();
