@@ -1,7 +1,9 @@
-// Locks the staff dashboard (/office) behind our own sign-in.
+// Locks the staff dashboard (/office) behind our own sign-in and checks each
+// person's role against the page they ask for.
 import { defineMiddleware } from 'astro:middleware';
 import { db, isDatabaseConfigured } from './lib/db/client';
 import { SESSION_COOKIE, clearSessionCookie, setSessionCookie, validateSession } from './lib/auth/session';
+import { allowed, homeFor, routeRule } from './lib/auth/permissions';
 
 const LOGIN = '/office/login';
 
@@ -27,8 +29,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (token) clearSessionCookie(context.cookies, secure);
     return context.redirect(`${LOGIN}?next=${encodeURIComponent(pathname)}`);
   }
-
   if (session.renewedUntil && token) setSessionCookie(context.cookies, token, session.renewedUntil, secure);
-  context.locals.user = session.user;
+  const { user } = session;
+  context.locals.user = user;
+
+  // Role check for this page.
+  const rule = routeRule(pathname);
+  if (!allowed(user, rule)) {
+    // Content editors land on the home page by default: send them to their own home instead of an error.
+    const home = homeFor(user);
+    if ((pathname === '/office' || pathname === '/office/') && home !== '/office') return context.redirect(home);
+    const page = await context.rewrite('/office/forbidden');
+    return new Response(page.body, { status: 403, headers: page.headers });
+  }
   return next();
 });

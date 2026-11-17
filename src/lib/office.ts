@@ -9,6 +9,7 @@ import ngorongoro from '../assets/images/placeholders/ngorongoro-nature.jpg';
 import rwanda from '../assets/images/placeholders/rwanda-hills.jpg';
 import lion from '../assets/images/placeholders/serengeti-lion.jpg';
 import type { PhotoKey, Tone } from '../data/office-sample';
+import type { Permission } from './auth/permissions';
 
 export const PHOTOS: Record<PhotoKey, ImageMetadata> = { elephant, kilimanjaro, lioness, mara, flamingos, ngorongoro, rwanda, lion };
 
@@ -31,11 +32,20 @@ export const INK: Record<Tone, string> = {
   leaf: 'text-leaf-ink',
 };
 
-export const OFFICE_NAV = [
-  { href: '/office', label: 'Overview' },
-  { href: '/office/bookings', label: 'Bookings', count: 5 },
-  { href: '/office/trips', label: 'Trips' },
-  { href: '/office/guests', label: 'Guests' },
-  { href: '/office/website', label: 'Website' },
-  { href: '/office/numbers', label: 'Numbers' },
-] as const;
+/** Dashboard tabs and the permission each needs (checked again on the server). */
+export const OFFICE_NAV: { href: string; label: string; perm: Permission; count?: number }[] = [
+  { href: '/office', label: 'Overview', perm: 'bookings:view' },
+  { href: '/office/bookings', label: 'Bookings', count: 5, perm: 'bookings:view' },
+  { href: '/office/trips', label: 'Trips', perm: 'bookings:view' },
+  { href: '/office/guests', label: 'Guests', perm: 'bookings:view' },
+  { href: '/office/website', label: 'Website', perm: 'content:view' },
+  { href: '/office/numbers', label: 'Numbers', perm: 'reports:view' },
+];
+
+/** Links in the account menu (top right). */
+export const ACCOUNT_LINKS: { href: string; label: string; perm?: Permission }[] = [
+  { href: '/office/account', label: 'My account' },
+  { href: '/office/users', label: 'Staff accounts', perm: 'users:manage' },
+  { href: '/office/fleet', label: 'Team & fleet', perm: 'fleet:manage' },
+  { href: '/office/settings', label: 'Site settings', perm: 'settings:manage' },
+];
