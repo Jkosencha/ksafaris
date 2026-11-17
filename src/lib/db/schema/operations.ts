@@ -9,6 +9,9 @@ export const guides = pgTable('guides', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   phone: text('phone'),
+  /** For example "English, Swahili, German". */
+  languages: text('languages'),
+  notes: text('notes'),
   isActive: boolean('is_active').notNull().default(true),
   ...timestamps,
 });
@@ -16,8 +19,11 @@ export const guides = pgTable('guides', {
 export const vehicles = pgTable('vehicles', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
+  /** Number plate, for example "KDA 123A". */
+  registration: text('registration'),
   seats: integer('seats'),
   nextService: date('next_service'),
+  notes: text('notes'),
   isActive: boolean('is_active').notNull().default(true),
   ...timestamps,
 });

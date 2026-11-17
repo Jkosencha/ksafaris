@@ -1,0 +1,198 @@
+---
+export const prerender = false; // Owner and Manager (fleet:manage, enforced by the middleware)
+/** Team & fleet: the guides and vehicles lists. Assigning them to trips comes with bookings (Phase 4). */
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { TONE } from '../../lib/office';
+import { formatDate } from '../../lib/dates';
+import { guideInput, listGuides, listVehicles, saveGuide, saveVehicle, serviceStatus, setGuideActive, setVehicleActive, vehicleInput } from '../../lib/services/fleet';
+
+const messages: Record<string, string> = {
+  'guide-added': 'Guide added.',
+  'guide-saved': 'Guide updated.',
+  'vehicle-added': 'Vehicle added.',
+  'vehicle-saved': 'Vehicle updated.',
+  'switched': 'Updated. Switched-off guides and vehicles stay in past trips but can’t be assigned to new ones.',
+};
+let errors: Record<string, string> = {};
+let draft: Record<string, string> = {};
+let failedForm = '';
+
+if (Astro.request.method === 'POST' && isDatabaseConfigured) {
+  const form = Object.fromEntries(await Astro.request.formData()) as Record<string, string>;
+  const id = form.id || undefined;
+  let done = '';
+  if (form.intent === 'guide') {
+    const parsed = guideInput.safeParse(form);
+    if (parsed.success) {
+      await saveGuide(db(), parsed.data, id);
+      done = id ? 'guide-saved' : 'guide-added';
+    } else errors = Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
+  } else if (form.intent === 'vehicle') {
+    const parsed = vehicleInput.safeParse(form);
+    if (parsed.success) {
+      await saveVehicle(db(), parsed.data, id);
+      done = id ? 'vehicle-saved' : 'vehicle-added';
+    } else errors = Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
+  } else if (form.intent === 'guide-active' && id) {
+    await setGuideActive(db(), id, form.active === 'true');
+    done = 'switched';
+  } else if (form.intent === 'vehicle-active' && id) {
+    await setVehicleActive(db(), id, form.active === 'true');
+    done = 'switched';
+  }
+  if (done) return Astro.redirect(`/office/fleet?done=${done}`, 303);
+  draft = form;
+  failedForm = `${form.intent}:${id ?? 'new'}`;
+  Astro.response.status = 422;
+}
+
+const [guideList, vehicleList] = isDatabaseConfigured ? await Promise.all([listGuides(db()), listVehicles(db())]) : [[], []];
+const done = Astro.url.searchParams.get('done') ?? '';
+const field = 'mt-1 block min-h-10 w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text aria-invalid:border-2 aria-invalid:border-clay';
+const label = 'text-[13px] font-bold text-o-soft';
+const isOpen = (key: string) => failedForm === key;
+const val = (key: string, fallback: string | number | null | undefined, formKey: string) => (failedForm === formKey ? (draft[key] ?? '') : String(fallback ?? ''));
+const err = (key: string, formKey: string) => (failedForm === formKey ? errors[key] : undefined);
+---
+
+<OfficeLayout title="Team & fleet">
+  <div>
+    <h1 class="font-display text-[34px] uppercase">Team &amp; fleet</h1>
+    <p class="mt-1.5 text-[15px] text-o-muted">Your guides and vehicles. Assigning them to trips, with availability and clash warnings, arrives with bookings.</p>
+  </div>
+
+  {!isDatabaseConfigured && <p class:list={['rounded-xl p-4 text-sm', TONE.gold.card]}>Connect the database to manage guides and vehicles.</p>}
+  {messages[done] && <p role="status" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.leaf.card]}>{messages[done]}</p>}
+  {Object.keys(errors).length > 0 && <p role="alert" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.clay.card]}>Some details need fixing; see the notes below.</p>}
+
+  <div class="grid items-start gap-6 lg:grid-cols-2">
+    <!-- Guides -->
+    <section aria-labelledby="guides" class="flex flex-col gap-3">
+      <div class:list={['flex items-center justify-between rounded-xl px-5 py-4', TONE.teal.card]}>
+        <h2 id="guides" class="font-display text-xl uppercase">Guides</h2>
+        <span class="text-sm font-bold">{guideList.filter((g) => g.isActive).length} active</span>
+      </div>
+      {guideList.length === 0 && <p class="rounded-xl bg-o-surface p-5 text-sm text-o-muted">No guides yet. Add your first one below.</p>}
+      {
+        guideList.map((g) => (
+          <article class:list={['rounded-xl bg-o-surface p-4', !g.isActive && 'opacity-60']}>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="font-bold">{g.name}</h3>
+                <p class="text-sm text-o-muted">{[g.phone, g.languages].filter(Boolean).join(' · ') || 'No phone or languages yet'}</p>
+                {g.notes && <p class="mt-1 text-sm text-o-soft">{g.notes}</p>}
+              </div>
+              <div class="flex items-center gap-2">
+                {!g.isActive && <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.clay.chip]}>Switched off</span>}
+                <form method="post">
+                  <input type="hidden" name="intent" value="guide-active" />
+                  <input type="hidden" name="id" value={g.id} />
+                  <input type="hidden" name="active" value={String(!g.isActive)} />
+                  <button type="submit" class:list={['min-h-9 rounded-full px-3 text-xs font-bold', g.isActive ? TONE.clay.chip : TONE.leaf.chip]}>{g.isActive ? 'Switch off' : 'Switch on'}</button>
+                </form>
+              </div>
+            </div>
+            <details class="mt-2" open={isOpen(`guide:${g.id}`)}>
+              <summary class="inline-flex min-h-9 cursor-pointer list-none items-center rounded-full bg-o-surface2 px-3 text-xs font-bold [&::-webkit-details-marker]:hidden">Edit</summary>
+              <form method="post" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" name="intent" value="guide" />
+                <input type="hidden" name="id" value={g.id} />
+                <label class={label}>Name<input name="name" required value={val('name', g.name, `guide:${g.id}`)} aria-invalid={err('name', `guide:${g.id}`) ? 'true' : undefined} class={field} />{err('name', `guide:${g.id}`) && <span class="mt-1 block font-semibold text-clay-ink">{err('name', `guide:${g.id}`)}</span>}</label>
+                <label class={label}>Phone<input name="phone" type="tel" value={val('phone', g.phone, `guide:${g.id}`)} class={field} /></label>
+                <label class:list={[label, 'sm:col-span-2']}>Languages<input name="languages" value={val('languages', g.languages, `guide:${g.id}`)} placeholder="English, Swahili, German" class={field} /></label>
+                <label class:list={[label, 'sm:col-span-2']}>Notes<textarea name="notes" rows="2" class:list={[field, 'py-2']}>{val('notes', g.notes, `guide:${g.id}`)}</textarea></label>
+                <div><button type="submit" class="min-h-10 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Save guide</button></div>
+              </form>
+            </details>
+          </article>
+        ))
+      }
+      {
+        isDatabaseConfigured && (
+          <details class="rounded-xl bg-o-surface" open={isOpen('guide:new')}>
+            <summary class="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 font-bold [&::-webkit-details-marker]:hidden">
+              <span class:list={['flex size-7 items-center justify-center rounded-full text-lg', TONE.teal.chip]}>+</span> Add a guide
+            </summary>
+            <form method="post" class="grid gap-3 px-4 pb-4 sm:grid-cols-2">
+              <input type="hidden" name="intent" value="guide" />
+              <label class={label}>Name<input name="name" required value={val('name', '', 'guide:new')} aria-invalid={err('name', 'guide:new') ? 'true' : undefined} class={field} />{err('name', 'guide:new') && <span class="mt-1 block font-semibold text-clay-ink">{err('name', 'guide:new')}</span>}</label>
+              <label class={label}>Phone<input name="phone" type="tel" value={val('phone', '', 'guide:new')} class={field} /></label>
+              <label class:list={[label, 'sm:col-span-2']}>Languages<input name="languages" value={val('languages', '', 'guide:new')} placeholder="English, Swahili, German" class={field} /></label>
+              <label class:list={[label, 'sm:col-span-2']}>Notes<textarea name="notes" rows="2" class:list={[field, 'py-2']}>{val('notes', '', 'guide:new')}</textarea></label>
+              <div><button type="submit" class="min-h-10 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Add guide</button></div>
+            </form>
+          </details>
+        )
+      }
+    </section>
+
+    <!-- Vehicles -->
+    <section aria-labelledby="vehicles" class="flex flex-col gap-3">
+      <div class:list={['flex items-center justify-between rounded-xl px-5 py-4', TONE.gold.card]}>
+        <h2 id="vehicles" class="font-display text-xl uppercase">Vehicles</h2>
+        <span class="text-sm font-bold">{vehicleList.filter((v) => v.isActive).length} active</span>
+      </div>
+      {vehicleList.length === 0 && <p class="rounded-xl bg-o-surface p-5 text-sm text-o-muted">No vehicles yet. Add your first one below.</p>}
+      {
+        vehicleList.map((v) => {
+          const service = v.isActive ? serviceStatus(v.nextService) : null;
+          const key = `vehicle:${v.id}`;
+          return (
+            <article class:list={['rounded-xl bg-o-surface p-4', !v.isActive && 'opacity-60']}>
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="font-bold">{v.name}{v.registration && <span class="ml-2 rounded bg-o-surface2 px-1.5 py-0.5 font-mono text-xs">{v.registration}</span>}</h3>
+                  <p class="text-sm text-o-muted">{[v.seats && `${v.seats} seats`, v.nextService && `Service ${formatDate(v.nextService)}`].filter(Boolean).join(' · ') || 'No seats or service date yet'}</p>
+                  {v.notes && <p class="mt-1 text-sm text-o-soft">{v.notes}</p>}
+                </div>
+                <div class="flex items-center gap-2">
+                  {service === 'overdue' && <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.clay.chip]}>Service overdue</span>}
+                  {service === 'soon' && <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.gold.chip]}>Service due soon</span>}
+                  {!v.isActive && <span class:list={['rounded-full px-2.5 py-0.5 text-xs font-bold', TONE.clay.chip]}>Switched off</span>}
+                  <form method="post">
+                    <input type="hidden" name="intent" value="vehicle-active" />
+                    <input type="hidden" name="id" value={v.id} />
+                    <input type="hidden" name="active" value={String(!v.isActive)} />
+                    <button type="submit" class:list={['min-h-9 rounded-full px-3 text-xs font-bold', v.isActive ? TONE.clay.chip : TONE.leaf.chip]}>{v.isActive ? 'Switch off' : 'Switch on'}</button>
+                  </form>
+                </div>
+              </div>
+              <details class="mt-2" open={isOpen(key)}>
+                <summary class="inline-flex min-h-9 cursor-pointer list-none items-center rounded-full bg-o-surface2 px-3 text-xs font-bold [&::-webkit-details-marker]:hidden">Edit</summary>
+                <form method="post" class="mt-3 grid gap-3 sm:grid-cols-2">
+                  <input type="hidden" name="intent" value="vehicle" />
+                  <input type="hidden" name="id" value={v.id} />
+                  <label class={label}>Name<input name="name" required value={val('name', v.name, key)} aria-invalid={err('name', key) ? 'true' : undefined} class={field} />{err('name', key) && <span class="mt-1 block font-semibold text-clay-ink">{err('name', key)}</span>}</label>
+                  <label class={label}>Number plate<input name="registration" value={val('registration', v.registration, key)} placeholder="KDA 123A" class={field} /></label>
+                  <label class={label}>Seats<input name="seats" type="number" min="1" max="60" inputmode="numeric" value={val('seats', v.seats, key)} aria-invalid={err('seats', key) ? 'true' : undefined} class={field} />{err('seats', key) && <span class="mt-1 block font-semibold text-clay-ink">{err('seats', key)}</span>}</label>
+                  <label class={label}>Next service<input name="nextService" type="date" value={val('nextService', v.nextService, key)} aria-invalid={err('nextService', key) ? 'true' : undefined} class={field} />{err('nextService', key) && <span class="mt-1 block font-semibold text-clay-ink">{err('nextService', key)}</span>}</label>
+                  <label class:list={[label, 'sm:col-span-2']}>Notes<textarea name="notes" rows="2" class:list={[field, 'py-2']}>{val('notes', v.notes, key)}</textarea></label>
+                  <div><button type="submit" class="min-h-10 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Save vehicle</button></div>
+                </form>
+              </details>
+            </article>
+          );
+        })
+      }
+      {
+        isDatabaseConfigured && (
+          <details class="rounded-xl bg-o-surface" open={isOpen('vehicle:new')}>
+            <summary class="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 font-bold [&::-webkit-details-marker]:hidden">
+              <span class:list={['flex size-7 items-center justify-center rounded-full text-lg', TONE.gold.chip]}>+</span> Add a vehicle
+            </summary>
+            <form method="post" class="grid gap-3 px-4 pb-4 sm:grid-cols-2">
+              <input type="hidden" name="intent" value="vehicle" />
+              <label class={label}>Name<input name="name" required value={val('name', '', 'vehicle:new')} placeholder="Land Cruiser 1" aria-invalid={err('name', 'vehicle:new') ? 'true' : undefined} class={field} />{err('name', 'vehicle:new') && <span class="mt-1 block font-semibold text-clay-ink">{err('name', 'vehicle:new')}</span>}</label>
+              <label class={label}>Number plate<input name="registration" value={val('registration', '', 'vehicle:new')} placeholder="KDA 123A" class={field} /></label>
+              <label class={label}>Seats<input name="seats" type="number" min="1" max="60" inputmode="numeric" value={val('seats', '', 'vehicle:new')} aria-invalid={err('seats', 'vehicle:new') ? 'true' : undefined} class={field} />{err('seats', 'vehicle:new') && <span class="mt-1 block font-semibold text-clay-ink">{err('seats', 'vehicle:new')}</span>}</label>
+              <label class={label}>Next service<input name="nextService" type="date" value={val('nextService', '', 'vehicle:new')} class={field} /></label>
+              <label class:list={[label, 'sm:col-span-2']}>Notes<textarea name="notes" rows="2" class:list={[field, 'py-2']}>{val('notes', '', 'vehicle:new')}</textarea></label>
+              <div><button type="submit" class="min-h-10 rounded-full bg-teal px-5 text-sm font-bold text-[#0e1d1e]">Add vehicle</button></div>
+            </form>
+          </details>
+        )
+      }
+    </section>
+  </div>
+</OfficeLayout>
