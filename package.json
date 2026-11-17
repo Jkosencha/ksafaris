@@ -11,7 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test": "vitest run",
+    "test": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file=.env ./node_modules/drizzle-kit/bin.cjs migrate",
     "create-owner": "node --env-file=.env scripts/create-owner.mjs"
