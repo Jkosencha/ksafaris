@@ -1,10 +1,14 @@
 // Creates the first Owner account for the staff dashboard.
 // Usage: npm run create-owner -- --email owner@example.com --name "Jane Doe"
 // The password is typed at a hidden prompt (never on the command line).
+import { setDefaultAutoSelectFamilyAttemptTimeout } from 'node:net';
 import { createInterface } from 'node:readline';
 import { parseArgs } from 'node:util';
 import postgres from 'postgres';
 import { hash } from '@node-rs/argon2';
+
+// Allow slow long-distance connections to Neon (see src/lib/db/client.ts).
+setDefaultAutoSelectFamilyAttemptTimeout(2500);
 
 const MIN_LENGTH = 12;
 const { values } = parseArgs({ options: { email: { type: 'string' }, name: { type: 'string' } } });

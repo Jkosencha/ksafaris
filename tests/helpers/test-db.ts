@@ -1,10 +1,14 @@
 // A clean test database for each test file. Runs only when TEST_DATABASE_URL
 // is set, and refuses to touch the main database.
+import { setDefaultAutoSelectFamilyAttemptTimeout } from 'node:net';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import * as schema from '../../src/lib/db/schema';
 import type { Database } from '../../src/lib/db/types';
+
+// Allow slow long-distance connections (see src/lib/db/client.ts).
+setDefaultAutoSelectFamilyAttemptTimeout(2500);
 
 export const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 
