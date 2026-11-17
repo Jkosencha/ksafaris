@@ -1,0 +1,134 @@
+---
+export const prerender = false; // Owner only (enforced by the middleware route table)
+/** Site settings: the agency's details shown across the website. */
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { TONE } from '../../lib/office';
+import { forgetSiteSettings } from '../../lib/site-settings-cache';
+import { currency } from '../../lib/db/schema';
+import { getSiteSettings, saveSiteSettings, siteSettingsInput, DEFAULT_SITE_SETTINGS, type SiteSettings } from '../../lib/services/site-settings';
+
+let values: Record<string, string> = {};
+let errors: Record<string, string> = {};
+
+if (Astro.request.method === 'POST' && isDatabaseConfigured) {
+  values = Object.fromEntries(await Astro.request.formData()) as Record<string, string>;
+  const parsed = siteSettingsInput.safeParse(values);
+  if (parsed.success) {
+    await saveSiteSettings(db(), parsed.data, Astro.locals.user?.id ?? null);
+    forgetSiteSettings();
+    return Astro.redirect('/office/settings?saved=1', 303);
+  }
+  errors = Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
+  Astro.response.status = 422;
+}
+
+const current: SiteSettings = isDatabaseConfigured ? await getSiteSettings(db()) : DEFAULT_SITE_SETTINGS;
+const value = (key: keyof SiteSettings) => values[key] ?? String(current[key] ?? '');
+
+const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text aria-invalid:border-2 aria-invalid:border-clay';
+const label = 'text-[13px] font-bold text-o-soft';
+const group = 'grid gap-4 rounded-xl bg-o-surface p-5 sm:grid-cols-2 sm:p-6';
+const heading = 'font-display text-xl uppercase sm:col-span-2';
+
+type Field = { key: keyof SiteSettings; label: string; type?: 'text' | 'email' | 'tel' | 'url'; hint?: string; wide?: boolean; long?: boolean; required?: boolean };
+const sections: { title: string; intro?: string; fields: Field[] }[] = [
+  {
+    title: 'Agency',
+    fields: [
+      { key: 'agencyName', label: 'Agency name', required: true },
+      { key: 'tagline', label: 'Tagline', hint: 'Shown at the top of every page and in the footer.' },
+    ],
+  },
+  {
+    title: 'Contact',
+    intro: 'Shown in the header, footer, contact page, WhatsApp button and booking forms.',
+    fields: [
+      { key: 'email', label: 'Email', type: 'email', required: true },
+      { key: 'phone', label: 'Phone, as people should see it', type: 'tel', required: true, hint: 'For example +254 736 112 673' },
+      { key: 'whatsappNumber', label: 'WhatsApp number', required: true, hint: 'Country code and number, no spaces or +. For example 254736112673' },
+      { key: 'address', label: 'Where you are', hint: 'For example Nairobi, Kenya' },
+    ],
+  },
+  {
+    title: 'Social and review links',
+    intro: 'Leave a link empty to hide its icon. Links must start with https://',
+    fields: [
+      { key: 'facebookUrl', label: 'Facebook', type: 'url' },
+      { key: 'instagramUrl', label: 'Instagram', type: 'url' },
+      { key: 'tiktokUrl', label: 'TikTok', type: 'url' },
+      { key: 'xUrl', label: 'X (Twitter)', type: 'url' },
+      { key: 'tripadvisorUrl', label: 'Tripadvisor', type: 'url' },
+      { key: 'safaribookingsUrl', label: 'SafariBookings', type: 'url' },
+    ],
+  },
+  {
+    title: 'Bookings',
+    intro: 'Used for quotes, deposits and the booking pages.',
+    fields: [
+      { key: 'bookingTerms', label: 'Booking terms', long: true, wide: true },
+      { key: 'cancellationPolicy', label: 'Cancellation and refund policy', long: true, wide: true },
+    ],
+  },
+];
+---
+
+<OfficeLayout title="Site settings">
+  <div>
+    <h1 class="font-display text-[34px] uppercase">Site settings</h1>
+    <p class="mt-1.5 text-[15px] text-o-muted">The agency’s details used across the website. Changes show on the site within a minute.</p>
+  </div>
+
+  {!isDatabaseConfigured && <p class:list={['rounded-xl p-4 text-sm', TONE.gold.card]}>Connect the database to edit site settings.</p>}
+  {Astro.url.searchParams.get('saved') && <p role="status" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.leaf.card]}>Saved. The website now uses these details.</p>}
+  {Object.keys(errors).length > 0 && <p role="alert" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.clay.card]}>Some details need fixing; see the notes below.</p>}
+
+  <form method="post" class="flex max-w-4xl flex-col gap-5">
+    {
+      sections.map((section) => (
+        <fieldset class={group}>
+          <legend class="sr-only">{section.title}</legend>
+          <h2 class={heading}>{section.title}</h2>
+          {section.intro && <p class="-mt-2 text-sm text-o-muted sm:col-span-2">{section.intro}</p>}
+          {section.fields.map((f) => (
+            <label class:list={[label, (f.wide || f.long) && 'sm:col-span-2']}>
+              {f.label}
+              {f.required && ' *'}
+              {f.long ? (
+                <textarea name={f.key} rows="5" aria-invalid={errors[f.key] ? 'true' : undefined} class:list={[field, 'resize-y py-2.5 leading-normal']}>{value(f.key)}</textarea>
+              ) : (
+                <input name={f.key} type={f.type ?? 'text'} required={f.required} value={value(f.key)} aria-invalid={errors[f.key] ? 'true' : undefined} class={field} />
+              )}
+              {errors[f.key] ? (
+                <span class="mt-1 block font-semibold text-clay-ink">{errors[f.key]}</span>
+              ) : (
+                f.hint && <span class="mt-1 block font-normal text-o-muted">{f.hint}</span>
+              )}
+            </label>
+          ))}
+          {section.title === 'Bookings' && (
+            <>
+              <label class={label}>
+                Default currency
+                <select name="defaultCurrency" class={field}>
+                  {currency.enumValues.map((c) => <option selected={value('defaultCurrency') === c}>{c}</option>)}
+                </select>
+              </label>
+              <label class={label}>
+                Deposit to confirm a booking (%)
+                <input name="depositPercentage" type="number" min="0" max="100" step="1" inputmode="numeric" value={value('depositPercentage')} aria-invalid={errors.depositPercentage ? 'true' : undefined} class={field} />
+                {errors.depositPercentage && <span class="mt-1 block font-semibold text-clay-ink">{errors.depositPercentage}</span>}
+              </label>
+            </>
+          )}
+        </fieldset>
+      ))
+    }
+
+    <p class:list={['rounded-xl px-4 py-3 text-sm', TONE.gold.card]}>The logo upload arrives with photo uploads in the next phase.</p>
+
+    <div class="flex justify-end">
+      <button type="submit" disabled={!isDatabaseConfigured} class="min-h-11 rounded-full bg-teal px-6 text-sm font-bold text-[#0e1d1e] disabled:opacity-50">Save settings</button>
+    </div>
+  </form>
+</OfficeLayout>
