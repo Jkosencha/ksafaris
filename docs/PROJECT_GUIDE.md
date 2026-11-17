@@ -6,6 +6,9 @@
 > - DB driver: **postgres** (postgres.js). Validation: **zod via `astro/zod`** (already part of Astro, no new dependency).
 > - Vitest approved as a dev dependency.
 > - Supabase was prepared but never connected, so there is no Supabase data to migrate.
+> - Phase 1 completed 17 Nov 2026 (Neon live, Owner account created, Supabase removed).
+> - **Team & fleet** added (Section 9.1): managing guides and vehicles is built in Phase 2 next to the Users screen; assigning them to trips, availability and clash warnings come in Phase 4 with bookings.
+> - Public pages switch to on-request rendering in Phase 2 (not Phase 3) so Site settings edits show immediately. Settings are cached in memory for about a minute.
 
 > This is the source of truth for the project. Read it fully before writing code.
 > **This is an existing project.** Keep the current Astro site, dashboard screens and folder layout. Extend and rework; do not rebuild from scratch, and do not rename existing folders without asking.
@@ -308,6 +311,17 @@ Keep the existing screens and extend them:
 
 Every screen and action checks permissions on the server (Section 4.1).
 
+### 9.1 Team & fleet (guides and vehicles)
+
+Guides, vehicles, availability and who is assigned to what must come from the database, never from hard-coded sample data.
+
+- **Lists (Phase 2):** a Team & fleet screen to add, edit and switch off guides (name, phone, languages) and vehicles (name, registration, seats, next service date). Nothing is deleted; switching off keeps past trips correct.
+- **Assigning (Phase 4):** a confirmed booking gets a trip; its Guide and Vehicle dropdowns list active guides and vehicles. "Handled by" lists active staff users.
+- **Availability is calculated, never typed:** "Free until 14 Nov" / "On safari to 18 Nov" is worked out from trips.
+- **Clash warnings when assigning:** guide or vehicle already on another trip on those dates, vehicle service due during the trip, more travellers than seats. Warnings can be overridden (for example fly-in trips).
+- **Permissions:** Owner and Manager manage the lists (`fleet:manage`); Booking Agents assign (`fleet:view`); Content Editors see none of it.
+- **Open questions for the client:** are guides and drivers the same person (driver-guides)? Do they hire partner vehicles? Should guides get their own login later to see their trips?
+
 ---
 
 ## 10. Environment Variables
@@ -404,6 +418,7 @@ At the end of each phase: run type-check, lint and tests, summarise changes, and
 **Phase 2: Roles + site settings**
 - Role enum, permission map, server-side checks, Users screen
 - `siteSettings` table + editor. Replace hard-coded contact details everywhere.
+- Team & fleet lists (Section 9.1)
 
 **Phase 3: Content in the database**
 - Pages, FAQs, testimonials, destinations, categories, tours (new fields), images, itinerary days (activities), departures (if used)
@@ -413,6 +428,7 @@ At the end of each phase: run type-check, lint and tests, summarise changes, and
 
 **Phase 4: Bookings, Inbox, emails**
 - Booking fields (end date, cancelled, internal notes, source), status history, derived payment status (replaces the "Paid" stage)
+- Trips with guide and vehicle assignment, calculated availability and clash warnings (Section 9.1)
 - Inbox tables + screens, reply by email, Convert to booking
 - Email provider + all templates in Section 8
 - Rate limiting on forms
@@ -441,3 +457,4 @@ At the end of each phase: run type-check, lint and tests, summarise changes, and
 - How many staff will use the dashboard, and in which roles?
 - Does the website need more than one language?
 - Inbox: website enquiries only, or also their existing email account? (Default: website enquiries only.)
+- Team & fleet: driver-guides or separate drivers? Partner vehicles? Guide logins later? (Section 9.1)
