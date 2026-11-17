@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
@@ -13,6 +13,15 @@ export default defineConfig({
   output: 'static',
   adapter: node({ mode: 'standalone' }),
   trailingSlash: 'ignore',
+  // Server settings, checked by Astro and read when the server runs (never baked into the build).
+  env: {
+    schema: {
+      // Neon pooled connection string. Optional so the site still builds and runs
+      // without it; the dashboard stays locked (or in local preview) until it is set.
+      DATABASE_URL: envField.string({ context: 'server', access: 'secret', optional: true }),
+      SITE_URL: envField.string({ context: 'server', access: 'public', default: 'http://localhost:4321' }),
+    },
+  },
   integrations: [sitemap({ filter: (page) => !page.includes('/credits') && !page.endsWith('/book/') && !page.includes('/office') })],
   vite: {
     plugins: [tailwindcss()],
