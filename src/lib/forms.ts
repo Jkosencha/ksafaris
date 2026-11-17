@@ -5,10 +5,14 @@ export const fieldClass =
 export const labelClass = 'block text-sm font-medium text-ink-800';
 
 /**
- * Where submissions go. Set PUBLIC_ENQUIRY_ENDPOINT (Formspree, Web3Forms, a Netlify function…) in .env.
- * Without it, forms fall back to opening a pre-filled email to the office.
+ * Where submissions go:
+ * 1. PUBLIC_ENQUIRY_ENDPOINT, if set (an outside form service), otherwise
+ * 2. the site's own /api/enquiry, which saves into the dashboard, once Supabase is set up, otherwise
+ * 3. nothing: forms open a pre-filled email to the office.
  */
-export const FORM_ENDPOINT = (import.meta.env.PUBLIC_ENQUIRY_ENDPOINT as string | undefined) || '';
+const supabaseReady = Boolean(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
+export const FORM_ENDPOINT =
+  (import.meta.env.PUBLIC_ENQUIRY_ENDPOINT as string | undefined) || (supabaseReady ? '/api/enquiry' : '');
 
 const SKIP = new Set(['website', 'subject']);
 
