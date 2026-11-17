@@ -18,12 +18,19 @@ const { title } = Astro.props;
 const preview = Astro.locals.officePreview;
 // In the local preview (no database) there is no signed-in user: show everything as an Owner would see it.
 const person = Astro.locals.user ?? { name: STAFF.name, role: 'owner' as const };
-const tabs = OFFICE_NAV.filter((item) => can(person, item.perm));
 const accountLinks = ACCOUNT_LINKS.filter((l) => !l.perm || can(person, l.perm));
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const under = (href: string) => path === href || path.startsWith(`${href}/`);
-const isActive = (item: { href: string; also?: string[] }) =>
-  item.href === '/office' ? path === '/office' : under(item.href) || (item.also ?? []).some(under);
+// Each tab the person may open, with its dropdown links (if any) filtered by their own permissions.
+const tabs = OFFICE_NAV.filter((item) => can(person, item.perm)).map((item) => {
+  const kids = (item.children ?? []).filter((c) => !c.perm || can(person, c.perm));
+  const active = item.href === '/office' ? path === '/office' : under(item.href) || kids.some((c) => under(c.href));
+  return { ...item, kids, active };
+});
+const tabClass = (active: boolean) => [
+  'flex min-h-11 items-center gap-2 rounded-full px-3.5 text-[15px] whitespace-nowrap no-underline',
+  active ? 'bg-o-pill font-bold text-o-pill-text' : 'text-o-bar-muted hover:bg-white/10',
+];
 ---
 
 <!doctype html>
@@ -54,26 +61,43 @@ const isActive = (item: { href: string; also?: string[] }) =>
         <a href="/office" class="font-display text-[22px] tracking-wider text-o-bar-text no-underline">
           KSAFARIS <span class="font-hand text-lg tracking-normal text-gold">office</span>
         </a>
-        <nav aria-label="Dashboard" class="order-3 w-full overflow-x-auto lg:order-none lg:w-auto">
-          <ul class="flex gap-1">
+        <nav aria-label="Dashboard" class="order-3 w-full lg:order-none lg:w-auto">
+          <ul class="flex flex-wrap gap-1">
             {
-              tabs.map((item) => (
-                <li>
-                  <a
-                    href={item.href}
-                    aria-current={isActive(item) ? 'page' : undefined}
-                    class:list={[
-                      'flex min-h-11 items-center gap-2 rounded-full px-3.5 text-[15px] whitespace-nowrap no-underline',
-                      isActive(item) ? 'bg-o-pill font-bold text-o-pill-text' : 'text-o-bar-muted hover:bg-white/10',
-                    ]}
-                  >
-                    {item.label}
-                    {item.count !== undefined && (
-                      <span class="rounded-full bg-gold px-2 text-xs font-bold text-[#2b2208]">{item.count}</span>
-                    )}
-                  </a>
-                </li>
-              ))
+              tabs.map((item) =>
+                item.kids.length > 0 ? (
+                  <li>
+                    <details class="group relative" data-menu>
+                      <summary class:list={[tabClass(item.active), 'cursor-pointer list-none [&::-webkit-details-marker]:hidden']}>
+                        {item.label}
+                        <svg aria-hidden="true" width="14" height="14" class="size-3.5 shrink-0 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </summary>
+                      <ul class="absolute right-0 z-30 mt-2 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-o-surface py-1 text-o-text shadow-xl ring-1 ring-black/10">
+                        {item.kids.map((c) => (
+                          <li>
+                            <a
+                              href={c.href}
+                              aria-current={path === c.href ? 'page' : undefined}
+                              class:list={['flex min-h-11 items-center px-4 text-sm text-o-text no-underline hover:bg-o-surface2', path === c.href && 'font-bold']}
+                            >
+                              {c.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </li>
+                ) : (
+                  <li>
+                    <a href={item.href} aria-current={item.active ? 'page' : undefined} class:list={tabClass(item.active)}>
+                      {item.label}
+                      {item.count !== undefined && <span class="rounded-full bg-gold px-2 text-xs font-bold text-[#2b2208]">{item.count}</span>}
+                    </a>
+                  </li>
+                ),
+              )
             }
           </ul>
         </nav>
@@ -92,7 +116,7 @@ const isActive = (item: { href: string; also?: string[] }) =>
               <a href="/office/bookings/new" class="flex h-11 items-center rounded-full bg-gold px-4 text-sm font-bold text-[#2b2208] no-underline">+ New booking</a>
             )
           }
-          <details class="group relative" data-account-menu>
+          <details class="group relative" data-menu>
             <summary
               aria-label={`Account menu for ${person.name}`}
               class="flex size-11 cursor-pointer list-none items-center justify-center rounded-full hover:bg-white/10 [&::-webkit-details-marker]:hidden"
@@ -159,15 +183,22 @@ const isActive = (item: { href: string; also?: string[] }) =>
       });
       sync();
 
-      // Close the account menu when clicking elsewhere or pressing Escape.
-      const menu = document.querySelector<HTMLDetailsElement>('[data-account-menu]');
+      // Dropdowns (Admin, account): one open at a time; close on an outside click or Escape.
+      const menus = [...document.querySelectorAll<HTMLDetailsElement>('[data-menu]')];
+      menus.forEach((m) =>
+        m.addEventListener('toggle', () => {
+          if (m.open) menus.forEach((other) => other !== m && (other.open = false));
+        }),
+      );
       document.addEventListener('click', (e) => {
-        if (menu?.open && !menu.contains(e.target as Node)) menu.open = false;
+        menus.forEach((m) => m.open && !m.contains(e.target as Node) && (m.open = false));
       });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menu?.open) {
-          menu.open = false;
-          menu.querySelector('summary')?.focus();
+        if (e.key !== 'Escape') return;
+        const open = menus.find((m) => m.open);
+        if (open) {
+          open.open = false;
+          open.querySelector('summary')?.focus();
         }
       });
     </script>
