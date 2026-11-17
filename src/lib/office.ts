@@ -33,13 +33,15 @@ export const INK: Record<Tone, string> = {
 };
 
 /** Dashboard tabs and the permission each needs (checked again on the server). */
-export const OFFICE_NAV: { href: string; label: string; perm: Permission; count?: number }[] = [
+export const OFFICE_NAV: { href: string; label: string; perm: Permission; count?: number; also?: string[] }[] = [
   { href: '/office', label: 'Overview', perm: 'bookings:view' },
   { href: '/office/bookings', label: 'Bookings', count: 5, perm: 'bookings:view' },
   { href: '/office/trips', label: 'Trips', perm: 'bookings:view' },
   { href: '/office/guests', label: 'Guests', perm: 'bookings:view' },
   { href: '/office/website', label: 'Website', perm: 'content:view' },
   { href: '/office/numbers', label: 'Numbers', perm: 'reports:view' },
+  // Owners and Managers (both hold fleet:manage). Stays highlighted on the admin pages it links to.
+  { href: '/office/admin', label: 'Admin', perm: 'fleet:manage', also: ['/office/users', '/office/fleet', '/office/settings'] },
 ];
 
 /** Links in the account menu (top right). */

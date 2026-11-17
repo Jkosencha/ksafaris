@@ -1,0 +1,82 @@
+---
+export const prerender = false; // Owners and Managers (enforced by the middleware route table)
+/** Admin: one place for staff accounts, team & fleet and site settings, with a live summary of each. */
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { can } from '../../lib/auth/permissions';
+import { TONE } from '../../lib/office';
+import { formatDateTime } from '../../lib/dates';
+import { listUsers } from '../../lib/services/users';
+import { listGuides, listVehicles, serviceStatus } from '../../lib/services/fleet';
+import { siteSettingsUpdatedAt } from '../../lib/services/site-settings';
+import type { Tone } from '../../data/office-sample';
+
+// In the local preview (no database) there is no signed-in user: show everything.
+const me = Astro.locals.user ?? { role: 'owner' as const };
+const live = isDatabaseConfigured;
+
+const [people, guides, vehicles, savedAt] = live
+  ? await Promise.all([
+      can(me, 'users:manage') ? listUsers(db()) : Promise.resolve([]),
+      listGuides(db()),
+      listVehicles(db()),
+      can(me, 'settings:manage') ? siteSettingsUpdatedAt(db()) : Promise.resolve(null),
+    ])
+  : [[], [], [], null];
+
+const activeVehicles = vehicles.filter((v) => v.isActive);
+const servicesDue = activeVehicles.filter((v) => serviceStatus(v.nextService)).length;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+const cards: { href: string; title: string; text: string; summary: string; warning?: string; tone: Tone; show: boolean }[] = [
+  {
+    href: '/office/users',
+    title: 'Staff accounts',
+    text: 'Add staff, set what each person can do, switch accounts off and reset passwords.',
+    summary: live ? `${plural(people.filter((p) => p.isActive).length, 'active account')}` : 'Connect the database to manage staff',
+    tone: 'teal',
+    show: can(me, 'users:manage'),
+  },
+  {
+    href: '/office/fleet',
+    title: 'Team & fleet',
+    text: 'Your guides and vehicles: phone numbers, languages, number plates, seats and service dates.',
+    summary: live ? `${plural(guides.filter((g) => g.isActive).length, 'guide')} · ${plural(activeVehicles.length, 'vehicle')}` : 'Connect the database to manage guides and vehicles',
+    warning: servicesDue ? `${plural(servicesDue, 'vehicle')} due for a service` : undefined,
+    tone: 'gold',
+    show: can(me, 'fleet:manage'),
+  },
+  {
+    href: '/office/settings',
+    title: 'Site settings',
+    text: 'The agency’s name, contact details, social links, deposit and booking terms shown on the website.',
+    summary: savedAt ? `Last saved ${formatDateTime(savedAt)}` : 'Using the original details (not edited yet)',
+    tone: 'leaf',
+    show: can(me, 'settings:manage'),
+  },
+];
+const visible = cards.filter((c) => c.show);
+---
+
+<OfficeLayout title="Admin">
+  <div>
+    <h1 class="font-display text-[34px] uppercase">Admin</h1>
+    <p class="mt-1.5 text-[15px] text-o-muted">Who can sign in, your guides and vehicles, and the details shown on the website.</p>
+  </div>
+
+  <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    {
+      visible.map((c) => (
+        <a href={c.href} class:list={['group flex flex-col gap-3 rounded-xl p-6 no-underline transition hover:-translate-y-0.5 hover:shadow-md', TONE[c.tone].card]}>
+          <h2 class="font-display text-2xl uppercase">{c.title}</h2>
+          <p class="text-sm leading-relaxed">{c.text}</p>
+          <p class="mt-auto inline-flex self-start rounded-full bg-o-surface px-3 py-1 text-sm font-bold text-o-text">{c.summary}</p>
+          {c.warning && <p class:list={['self-start rounded-full px-3 py-1 text-sm font-bold', TONE.clay.chip]}>{c.warning}</p>}
+          <span class="text-sm font-bold">
+            Open <span aria-hidden="true" class="inline-block transition group-hover:translate-x-1">→</span>
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</OfficeLayout>

@@ -54,6 +54,9 @@ describe('dashboard routes', () => {
     expect(routeRule('/office/users')).toBe('users:manage');
     expect(routeRule('/office/settings')).toBe('settings:manage');
     expect(routeRule('/office/fleet')).toBe('fleet:manage');
+    expect(routeRule('/office/admin')).toBe('fleet:manage');
+    expect(allowed(agent, routeRule('/office/admin'))).toBe(false);
+    expect(allowed(editor, routeRule('/office/admin'))).toBe(false);
     expect(routeRule('/office/account')).toBe('signed-in');
   });
 

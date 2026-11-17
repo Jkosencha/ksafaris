@@ -21,7 +21,9 @@ const person = Astro.locals.user ?? { name: STAFF.name, role: 'owner' as const }
 const tabs = OFFICE_NAV.filter((item) => can(person, item.perm));
 const accountLinks = ACCOUNT_LINKS.filter((l) => !l.perm || can(person, l.perm));
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isActive = (href: string) => (href === '/office' ? path === '/office' : path.startsWith(href));
+const under = (href: string) => path === href || path.startsWith(`${href}/`);
+const isActive = (item: { href: string; also?: string[] }) =>
+  item.href === '/office' ? path === '/office' : under(item.href) || (item.also ?? []).some(under);
 ---
 
 <!doctype html>
@@ -59,10 +61,10 @@ const isActive = (href: string) => (href === '/office' ? path === '/office' : pa
                 <li>
                   <a
                     href={item.href}
-                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    aria-current={isActive(item) ? 'page' : undefined}
                     class:list={[
                       'flex min-h-11 items-center gap-2 rounded-full px-3.5 text-[15px] whitespace-nowrap no-underline',
-                      isActive(item.href) ? 'bg-o-pill font-bold text-o-pill-text' : 'text-o-bar-muted hover:bg-white/10',
+                      isActive(item) ? 'bg-o-pill font-bold text-o-pill-text' : 'text-o-bar-muted hover:bg-white/10',
                     ]}
                   >
                     {item.label}

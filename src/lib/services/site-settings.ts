@@ -109,3 +109,9 @@ export function xHandle(s: SiteSettings): string | null {
   const name = s.xUrl?.match(/(?:x|twitter)\.com\/([A-Za-z0-9_]+)/)?.[1];
   return name ? `@${name}` : null;
 }
+
+/** When the settings were last saved, or null if they never have been (defaults in use). */
+export async function siteSettingsUpdatedAt(database: Database): Promise<Date | null> {
+  const [row] = await database.select({ updatedAt: siteSettings.updatedAt }).from(siteSettings).where(eq(siteSettings.id, true)).limit(1);
+  return row?.updatedAt ?? null;
+}

@@ -45,6 +45,7 @@ const ROUTES: [prefix: string, rule: RouteRule][] = [
   ['/office/users', 'users:manage'],
   ['/office/settings', 'settings:manage'],
   ['/office/fleet', 'fleet:manage'],
+  ['/office/admin', 'fleet:manage'], // the Admin hub: Owners and Managers
   ['/office/account', SIGNED_IN],
   ['/office/logout', SIGNED_IN],
   ['/office/forbidden', SIGNED_IN],
