@@ -1,0 +1,100 @@
+---
+/** Staff sign-in for the KSafaris office dashboard. */
+import '../../styles/global.css';
+import { Image } from 'astro:assets';
+import { PHOTOS } from '../../lib/office';
+import { isSupabaseConfigured, supabaseForRequest } from '../../lib/supabase';
+
+export const prerender = false;
+
+const nextParam = Astro.url.searchParams.get('next') ?? '/office';
+// Only ever send people back to a dashboard page.
+const next = nextParam.startsWith('/office') && !nextParam.startsWith('//') ? nextParam : '/office';
+
+const messages: Record<string, string> = {
+  setup: 'The dashboard is not connected to its database yet.',
+  notstaff: 'That account is not on the staff list. Ask the office admin to add you.',
+  wrong: 'That email and password do not match. Try again.',
+  missing: 'Enter your email and password.',
+};
+let error = Astro.url.searchParams.get('error') ?? '';
+let email = '';
+
+if (Astro.request.method === 'POST' && isSupabaseConfigured) {
+  const form = await Astro.request.formData();
+  email = String(form.get('email') ?? '').trim();
+  const password = String(form.get('password') ?? '');
+  if (!email || !password) {
+    error = 'missing';
+  } else {
+    const supabase = supabaseForRequest(Astro.request, Astro.cookies);
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (!signInError) return Astro.redirect(next, 303);
+    error = 'wrong';
+  }
+}
+
+const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text';
+---
+
+<!doctype html>
+<html lang="en" class="office">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Sign in | KSafaris office</title>
+    <script is:inline>
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('office-theme'); } catch (e) {}
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body class="relative isolate grid min-h-dvh place-items-center p-4 font-sans antialiased">
+    <Image src={PHOTOS.kilimanjaro} alt="" widths={[800, 1400, 2000]} sizes="100vw" class="absolute inset-0 -z-20 size-full object-cover" loading="eager" />
+    <div aria-hidden="true" class="absolute inset-0 -z-10 bg-[#121610]/60"></div>
+
+    <main class="w-full max-w-sm overflow-hidden rounded-2xl bg-o-surface shadow-2xl">
+      <div class="bg-o-bar px-7 py-6 text-o-bar-text">
+        <p class="font-display text-2xl tracking-wider">KSAFARIS <span class="font-hand text-xl tracking-normal text-gold">office</span></p>
+        <p class="mt-1 text-sm text-o-bar-muted">Staff sign-in</p>
+      </div>
+      <div aria-hidden="true" class="grid h-1 grid-cols-4">
+        <span class="bg-teal"></span><span class="bg-gold"></span><span class="bg-clay"></span><span class="bg-leaf"></span>
+      </div>
+
+      <form method="post" class="flex flex-col gap-4 px-7 py-6">
+        <h1 class="sr-only">Sign in to the KSafaris office</h1>
+        {
+          error && messages[error] && (
+            <p role="alert" class="rounded-lg bg-clay-soft px-3.5 py-2.5 text-sm font-semibold text-clay-ink">
+              {messages[error]}
+            </p>
+          )
+        }
+        {
+          !isSupabaseConfigured && !error && (
+            <p class="rounded-lg bg-gold-soft px-3.5 py-2.5 text-sm text-gold-ink">
+              Sign-in will work once the database is connected. While building on this computer, the dashboard is open with sample data:{' '}
+              <a href="/office" class="font-bold underline">open it</a>.
+            </p>
+          )
+        }
+        <label class="text-[13px] font-bold text-o-soft">
+          Email
+          <input name="email" type="email" autocomplete="username" required value={email} class={field} />
+        </label>
+        <label class="text-[13px] font-bold text-o-soft">
+          Password
+          <input name="password" type="password" autocomplete="current-password" required class={field} />
+        </label>
+        <button type="submit" disabled={!isSupabaseConfigured} class="min-h-11 rounded-full bg-teal font-bold text-[#0e1d1e] disabled:opacity-50">Sign in</button>
+        <p class="text-center text-xs text-o-muted">Forgotten your password? Ask the office admin to reset it.</p>
+      </form>
+    </main>
+  </body>
+</html>

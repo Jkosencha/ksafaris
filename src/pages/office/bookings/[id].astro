@@ -1,17 +1,14 @@
 ---
-import type { GetStaticPaths } from 'astro';
+export const prerender = false; // runs on each request, behind the staff sign-in
 import { Image } from 'astro:assets';
 import OfficeLayout from '../../../layouts/OfficeLayout.astro';
 import StagePill from '../../../components/office/StagePill.astro';
 import { PHOTOS, TONE } from '../../../lib/office';
 import { BOOKINGS, STAGES, type Booking, type Stage } from '../../../data/office-sample';
 
-export const getStaticPaths = (() => BOOKINGS.map((b) => ({ params: { id: b.id }, props: { b } }))) satisfies GetStaticPaths;
-
-interface Props {
-  b: Booking;
-}
-const { b } = Astro.props;
+const found = BOOKINGS.find((x) => x.id === Astro.params.id);
+if (!found) return new Response('Booking not found', { status: 404 });
+const b: Booking = found;
 const first = b.guest.split(' ')[0];
 
 // The steps a booking moves through, and where this one is.

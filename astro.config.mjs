@@ -2,11 +2,16 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://ksafaris-africanexpeditions.com',
+  // Pages are pre-built; only the staff dashboard (/office) runs on request,
+  // behind its sign-in. The host is not chosen yet: Node works anywhere, and
+  // swapping to the Netlify or Vercel adapter later is a one-line change.
   output: 'static',
+  adapter: node({ mode: 'standalone' }),
   trailingSlash: 'ignore',
   integrations: [sitemap({ filter: (page) => !page.includes('/credits') && !page.endsWith('/book/') && !page.includes('/office') })],
   vite: {

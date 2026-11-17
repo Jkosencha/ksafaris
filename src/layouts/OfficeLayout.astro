@@ -14,6 +14,8 @@ interface Props {
 }
 
 const { title } = Astro.props;
+const person = Astro.locals.staff ?? { name: STAFF.name };
+const preview = Astro.locals.officePreview;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => (href === '/office' ? path === '/office' : path.startsWith(href));
 ---
@@ -80,15 +82,29 @@ const isActive = (href: string) => (href === '/office' ? path === '/office' : pa
             <svg data-icon="sun" aria-hidden="true" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
           </button>
           <a href="/office/bookings/new" class="flex h-11 items-center rounded-full bg-gold px-4 text-sm font-bold text-[#2b2208] no-underline">+ New booking</a>
-          <span role="img" aria-label={`Signed in as ${STAFF.name}`} class="flex size-9 items-center justify-center rounded-full bg-teal font-bold text-[#0e1d1e]">
-            {STAFF.name.charAt(0)}
+          <span role="img" aria-label={`Signed in as ${person.name}`} title={person.name} class="flex size-9 items-center justify-center rounded-full bg-teal font-bold text-[#0e1d1e]">
+            {person.name.charAt(0)}
           </span>
+          {
+            !preview && (
+              <form method="post" action="/office/logout">
+                <button type="submit" class="min-h-11 rounded-full px-3 text-sm font-semibold text-o-bar-muted hover:bg-white/10">Sign out</button>
+              </form>
+            )
+          }
         </div>
       </div>
     </header>
     <div aria-hidden="true" class="grid h-1 grid-cols-4">
       <span class="bg-teal"></span><span class="bg-gold"></span><span class="bg-clay"></span><span class="bg-leaf"></span>
     </div>
+    {
+      preview && (
+        <p class="bg-gold-soft px-4 py-2 text-center text-sm text-gold-ink">
+          <b>Preview on this computer:</b> sample data only, not connected to the database. Sign-in is switched on once the Supabase keys are added.
+        </p>
+      )
+    }
     <main id="main" class="mx-auto flex w-full max-w-[1360px] flex-col gap-7 px-4 pt-7 pb-12 sm:px-8">
       <slot />
     </main>
