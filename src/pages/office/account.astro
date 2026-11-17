@@ -1,0 +1,78 @@
+---
+export const prerender = false; // any signed-in staff member
+/** My account: your details and changing your own password. */
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { ROLE_LABELS } from '../../lib/auth/permissions';
+import { SESSION_COOKIE } from '../../lib/auth/session';
+import { TONE } from '../../lib/office';
+import { USER_ERRORS, changeOwnPassword, changePasswordInput } from '../../lib/services/users';
+
+const me = Astro.locals.user;
+let error = '';
+let fieldErrors: Record<string, string> = {};
+
+if (Astro.request.method === 'POST' && isDatabaseConfigured && me) {
+  const form = Object.fromEntries(await Astro.request.formData());
+  const parsed = changePasswordInput.safeParse(form);
+  if (!parsed.success) {
+    fieldErrors = Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
+  } else {
+    const token = Astro.cookies.get(SESSION_COOKIE)?.value ?? '';
+    const result = await changeOwnPassword(db(), me.id, token, parsed.data);
+    if (result.ok) return Astro.redirect('/office/account?done=1', 303);
+    error = USER_ERRORS[result.error];
+  }
+  Astro.response.status = 422;
+}
+
+const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text';
+const label = 'text-[13px] font-bold text-o-soft';
+---
+
+<OfficeLayout title="My account">
+  <div>
+    <h1 class="font-display text-[34px] uppercase">My account</h1>
+    <p class="mt-1.5 text-[15px] text-o-muted">Your details and your password.</p>
+  </div>
+
+  {Astro.url.searchParams.get('done') && <p role="status" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.leaf.card]}>Password changed. Your other devices have been signed out.</p>}
+  {error && <p role="alert" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.clay.card]}>{error}</p>}
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section aria-labelledby="me" class:list={['rounded-xl p-5', TONE.teal.card]}>
+      <h2 id="me" class="font-display text-xl uppercase">You</h2>
+      {
+        me ? (
+          <dl class="mt-3 grid gap-2 text-sm">
+            <div class="flex justify-between gap-3"><dt class="opacity-80">Name</dt><dd class="font-semibold">{me.name}</dd></div>
+            <div class="flex justify-between gap-3"><dt class="opacity-80">Email</dt><dd class="font-semibold break-all">{me.email}</dd></div>
+            <div class="flex justify-between gap-3"><dt class="opacity-80">Role</dt><dd class="font-semibold">{ROLE_LABELS[me.role]}</dd></div>
+          </dl>
+        ) : (
+          <p class="mt-3 text-sm">Sign-in is not connected in this preview.</p>
+        )
+      }
+      <p class="mt-4 text-xs">To change your name, email or role, ask the Owner.</p>
+    </section>
+
+    <section aria-labelledby="pw" class="rounded-xl bg-o-surface p-5">
+      <h2 id="pw" class="font-display text-xl uppercase">Change password</h2>
+      <form method="post" class="mt-3 flex flex-col gap-3.5">
+        <label class={label}>Current password
+          <input name="current" type="password" required autocomplete="current-password" class={field} />
+          {fieldErrors.current && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.current}</span>}
+        </label>
+        <label class={label}>New password (at least 12 characters)
+          <input name="next" type="password" required minlength="12" autocomplete="new-password" class={field} />
+          {fieldErrors.next && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.next}</span>}
+        </label>
+        <label class={label}>New password again
+          <input name="confirm" type="password" required minlength="12" autocomplete="new-password" class={field} />
+          {fieldErrors.confirm && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.confirm}</span>}
+        </label>
+        <button type="submit" disabled={!me} class="min-h-11 rounded-full bg-teal font-bold text-[#0e1d1e] disabled:opacity-50">Change password</button>
+      </form>
+    </section>
+  </div>
+</OfficeLayout>

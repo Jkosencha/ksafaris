@@ -1,0 +1,198 @@
+---
+export const prerender = false; // Owner only (enforced by the middleware route table)
+/** Staff accounts: add staff, set roles, switch accounts off and on, reset passwords. */
+import OfficeLayout from '../../layouts/OfficeLayout.astro';
+import { db, isDatabaseConfigured } from '../../lib/db/client';
+import { ROLE_LABELS } from '../../lib/auth/permissions';
+import { formatDateTime } from '../../lib/dates';
+import { TONE } from '../../lib/office';
+import { userRole, type Role } from '../../lib/db/schema';
+import { USER_ERRORS, changeRole, createStaffUser, listUsers, newStaffInput, resetPassword, setActive, type UserError } from '../../lib/services/users';
+
+const me = Astro.locals.user;
+const notice: Record<string, string> = {
+  created: 'Account created. Give them their email and temporary password; they can change it under My account.',
+  role: 'Role updated. It applies from their next page.',
+  off: 'Account switched off and signed out everywhere.',
+  on: 'Account switched back on.',
+  reset: 'Password reset. They have been signed out and must use the new password.',
+};
+let error = '';
+let fieldErrors: Record<string, string> = {};
+let draft: Record<string, string> = {};
+
+if (Astro.request.method === 'POST' && isDatabaseConfigured && me) {
+  const form = Object.fromEntries(await Astro.request.formData()) as Record<string, string>;
+  let result: { ok: true } | { ok: false; error: UserError } | undefined;
+  let done = '';
+  if (form.intent === 'create') {
+    const parsed = newStaffInput.safeParse(form);
+    if (!parsed.success) {
+      fieldErrors = Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
+      draft = form;
+    } else {
+      result = await createStaffUser(db(), parsed.data);
+      done = 'created';
+      if (!result.ok) draft = form;
+    }
+  } else if (form.intent === 'role' && (userRole.enumValues as readonly string[]).includes(form.role)) {
+    result = await changeRole(db(), me.id, form.userId, form.role as Role);
+    done = 'role';
+  } else if (form.intent === 'off' || form.intent === 'on') {
+    result = await setActive(db(), me.id, form.userId, form.intent === 'on');
+    done = form.intent;
+  } else if (form.intent === 'reset') {
+    if ((form.password ?? '').length < 12) error = 'Temporary passwords need at least 12 characters.';
+    else {
+      result = await resetPassword(db(), me.id, form.userId, form.password);
+      done = 'reset';
+    }
+  }
+  if (result?.ok) return Astro.redirect(`/office/users?done=${done}`, 303);
+  if (result && !result.ok) error = USER_ERRORS[result.error];
+  if (error || Object.keys(fieldErrors).length) Astro.response.status = 422;
+}
+
+const done = Astro.url.searchParams.get('done') ?? '';
+const people = isDatabaseConfigured ? await listUsers(db()) : [];
+const roleTone: Record<Role, keyof typeof TONE> = { owner: 'leaf', manager: 'teal', booking_agent: 'gold', content_editor: 'clay' };
+const field = 'mt-1 block min-h-11 w-full rounded-md border border-o-line2 bg-o-surface px-3 text-[15px] font-normal text-o-text';
+const label = 'text-[13px] font-bold text-o-soft';
+const randomPassword = () => crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+---
+
+<OfficeLayout title="Staff accounts">
+  <div>
+    <h1 class="font-display text-[34px] uppercase">Staff accounts</h1>
+    <p class="mt-1.5 text-[15px] text-o-muted">Who can sign in to the office, and what each role can do. Only the Owner sees this page.</p>
+  </div>
+
+  {!isDatabaseConfigured && <p class:list={['rounded-xl p-4 text-sm', TONE.gold.card]}>Connect the database to manage staff accounts.</p>}
+  {notice[done] && <p role="status" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.leaf.card]}>{notice[done]}</p>}
+  {error && <p role="alert" class:list={['rounded-xl px-4 py-3 text-sm font-semibold', TONE.clay.card]}>{error}</p>}
+
+  <section aria-labelledby="people" class="overflow-hidden rounded-xl bg-o-surface">
+    <h2 id="people" class="sr-only">Accounts</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[760px] text-sm">
+        <thead>
+          <tr class="text-left text-xs tracking-wider text-o-muted uppercase">
+            <th class="px-5 py-3.5 font-semibold">Person</th>
+            <th class="px-2 py-3.5 font-semibold">Role</th>
+            <th class="px-2 py-3.5 font-semibold">Status</th>
+            <th class="px-2 py-3.5 font-semibold">Last sign-in</th>
+            <th class="px-5 py-3.5 font-semibold"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            people.map((p) => {
+              const isMe = p.id === me?.id;
+              return (
+                <tr class:list={['border-t border-o-line align-top', !p.isActive && 'opacity-60']}>
+                  <td class="px-5 py-3.5">
+                    <span class="block font-bold">{p.name}{isMe && <span class="font-normal text-o-muted"> (you)</span>}</span>
+                    <span class="text-xs text-o-muted">{p.email}</span>
+                  </td>
+                  <td class="px-2 py-3">
+                    {isMe ? (
+                      <span class:list={['inline-block rounded-full px-2.5 py-0.5 text-xs font-bold', TONE[roleTone[p.role]].chip]}>{ROLE_LABELS[p.role]}</span>
+                    ) : (
+                      <form method="post" class="flex items-center gap-1.5">
+                        <input type="hidden" name="intent" value="role" />
+                        <input type="hidden" name="userId" value={p.id} />
+                        <label class="sr-only" for={`role-${p.id}`}>Role for {p.name}</label>
+                        <select id={`role-${p.id}`} name="role" class="min-h-9 rounded-md border border-o-line2 bg-o-surface px-2 text-sm text-o-text">
+                          {userRole.enumValues.map((r) => <option value={r} selected={r === p.role}>{ROLE_LABELS[r]}</option>)}
+                        </select>
+                        <button type="submit" class="min-h-9 rounded-full bg-o-surface2 px-3 text-xs font-bold">Save</button>
+                      </form>
+                    )}
+                  </td>
+                  <td class="px-2 py-3.5">
+                    <span class:list={['inline-block rounded-full px-2.5 py-0.5 text-xs font-bold', p.isActive ? TONE.leaf.chip : TONE.clay.chip]}>
+                      {p.isActive ? 'Active' : 'Switched off'}
+                    </span>
+                  </td>
+                  <td class="px-2 py-3.5 whitespace-nowrap text-o-muted">{p.lastLoginAt ? formatDateTime(p.lastLoginAt) : 'Never'}</td>
+                  <td class="px-5 py-3">
+                    {!isMe && (
+                      <div class="flex flex-wrap justify-end gap-2">
+                        <form method="post">
+                          <input type="hidden" name="intent" value={p.isActive ? 'off' : 'on'} />
+                          <input type="hidden" name="userId" value={p.id} />
+                          <button type="submit" class:list={['min-h-9 rounded-full px-3 text-xs font-bold', p.isActive ? TONE.clay.chip : TONE.leaf.chip]}>
+                            {p.isActive ? 'Switch off' : 'Switch on'}
+                          </button>
+                        </form>
+                        <details class="relative">
+                          <summary class="flex min-h-9 cursor-pointer list-none items-center rounded-full bg-o-surface2 px-3 text-xs font-bold [&::-webkit-details-marker]:hidden">Reset password</summary>
+                          <form method="post" class="absolute right-0 z-10 mt-2 w-72 rounded-xl bg-o-surface p-4 shadow-xl ring-1 ring-black/10">
+                            <input type="hidden" name="intent" value="reset" />
+                            <input type="hidden" name="userId" value={p.id} />
+                            <label class={label}>New temporary password
+                              <input name="password" required minlength="12" value={randomPassword()} autocomplete="off" class:list={[field, 'font-mono']} />
+                            </label>
+                            <p class="mt-2 text-xs text-o-muted">Copy it before saving and give it to {p.name.split(' ')[0]}. They will be signed out everywhere.</p>
+                            <button type="submit" class="mt-3 min-h-10 w-full rounded-full bg-teal text-sm font-bold text-[#0e1d1e]">Reset password</button>
+                          </form>
+                        </details>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {
+    isDatabaseConfigured && (
+      <details class="group rounded-xl bg-o-surface" open={Object.keys(fieldErrors).length > 0 || Boolean(draft.email)}>
+        <summary class="flex min-h-14 cursor-pointer list-none items-center gap-3 px-5 font-display text-xl uppercase [&::-webkit-details-marker]:hidden">
+          <span class:list={['flex size-7 items-center justify-center rounded-full font-sans text-lg', TONE.teal.chip]}>+</span> Add a staff member
+        </summary>
+        <form method="post" class="grid gap-4 px-5 pb-5 sm:grid-cols-2">
+          <input type="hidden" name="intent" value="create" />
+          <label class={label}>Full name
+            <input name="name" required value={draft.name ?? ''} class={field} />
+            {fieldErrors.name && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.name}</span>}
+          </label>
+          <label class={label}>Email (they sign in with this)
+            <input name="email" type="email" required value={draft.email ?? ''} class={field} />
+            {fieldErrors.email && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.email}</span>}
+          </label>
+          <label class={label}>Phone (optional)
+            <input name="phone" type="tel" value={draft.phone ?? ''} class={field} />
+          </label>
+          <label class={label}>Role
+            <select name="role" class={field}>
+              {userRole.enumValues.map((r) => <option value={r} selected={(draft.role ?? 'booking_agent') === r}>{ROLE_LABELS[r]}</option>)}
+            </select>
+          </label>
+          <label class:list={[label, 'sm:col-span-2']}>Temporary password (at least 12 characters)
+            <input name="password" required minlength="12" value={draft.password ?? randomPassword()} autocomplete="off" class:list={[field, 'font-mono']} />
+            {fieldErrors.password && <span class="mt-1 block font-semibold text-clay-ink">{fieldErrors.password}</span>}
+            <span class="mt-1 block font-normal text-o-muted">A random one is filled in. Copy it and give it to them privately; they can change it under My account.</span>
+          </label>
+          <div class="sm:col-span-2">
+            <button type="submit" class="min-h-11 rounded-full bg-teal px-6 text-sm font-bold text-[#0e1d1e]">Create account</button>
+          </div>
+        </form>
+      </details>
+    )
+  }
+
+  <section aria-labelledby="roles" class:list={['rounded-xl p-5 text-sm', TONE.gold.card]}>
+    <h2 id="roles" class="font-display text-lg uppercase">What each role can do</h2>
+    <ul class="mt-2 grid gap-1.5 sm:grid-cols-2">
+      <li><b>Owner:</b> everything, including staff accounts and site settings.</li>
+      <li><b>Manager:</b> everything except staff accounts and site settings.</li>
+      <li><b>Booking agent:</b> bookings, guests, trips, payments and the inbox; can view website content.</li>
+      <li><b>Content editor:</b> website content only (tours, destinations, pages, reviews).</li>
+    </ul>
+  </section>
+</OfficeLayout>

@@ -7,6 +7,7 @@ import StagePill from '../../components/office/StagePill.astro';
 import { PHOTOS, TONE } from '../../lib/office';
 import { BOOKINGS, DEPARTURES, ENQUIRIES_PER_WEEK, HEADLINES, STAFF, WEBSITE_COUNTS } from '../../data/office-sample';
 
+const firstName = (Astro.locals.user?.name ?? STAFF.name).split(' ')[0];
 const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 const latest = BOOKINGS.slice(0, 6);
 const maxWeek = Math.max(...ENQUIRIES_PER_WEEK);
@@ -22,7 +23,7 @@ const heading = 'font-display text-xl';
     <div class="flex w-full flex-wrap items-end justify-between gap-4 p-7">
       <div>
         <p class="font-hand text-2xl text-[#f3d48f]">{today}</p>
-        <h1 class="mt-0.5 font-display text-[42px] uppercase">Jambo, {STAFF.name}</h1>
+        <h1 class="mt-0.5 font-display text-[42px] uppercase">Jambo, {firstName}</h1>
         <p class="mt-1.5 text-[15px] text-[#eef1ec]">Today: 2 new booking requests, 1 deposit to chase and 1 trip without a guide.</p>
       </div>
       <form role="search" action="/office/guests" class="flex h-11 min-w-64 items-center gap-2 rounded-full bg-o-surface px-3.5 text-sm text-o-muted">
