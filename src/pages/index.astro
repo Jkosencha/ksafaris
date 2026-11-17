@@ -19,6 +19,7 @@ import ctaImage from '../assets/images/placeholders/nakuru-flamingos.jpg';
 import logo from '../assets/images/brand/logo.png';
 import { COMING_SOON, SITE, TRAVELLER_TYPES } from '../consts';
 import { travelAgency } from '../lib/schema';
+import { siteOf } from '../lib/site';
 
 const destinations = (await getCollection('destinations')).sort((a, b) => a.data.order - b.data.order);
 const tours = (await getCollection('tours', (t) => t.data.featured)).sort((a, b) => a.data.order - b.data.order);
@@ -45,7 +46,7 @@ const pillars = [
 ];
 ---
 
-<BaseLayout jsonLd={travelAgency(new URL(logoImg.src, Astro.site).href)}>
+<BaseLayout jsonLd={travelAgency(siteOf(Astro.locals), new URL(logoImg.src, Astro.site).href)}>
   <section class="relative isolate overflow-hidden bg-ink-900">
     <Image
       src={heroImage}

@@ -7,13 +7,15 @@ import heroImage from '../assets/images/placeholders/mara-lioness-vehicle.jpg';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import { COMING_SOON, SITE, TRAVELLER_TYPES } from '../consts';
+import { siteOf } from '../lib/site';
 
 const description =
   'KSafaris & African Expeditions is a private, locally owned Kenyan safari company and one of the leading inbound tour operators in East Africa.';
+const s = siteOf(Astro.locals);
 ---
 
 <BaseLayout title="About Us" description={description}>
-  <PageHero image={heroImage} imageAlt="A young lioness in long grass watched by guests in an open-roof safari vehicle" eyebrow="About us" title="A locally owned safari company, built in Kenya" lead={`“${SITE.motto}.”`} />
+  <PageHero image={heroImage} imageAlt="A young lioness in long grass watched by guests in an open-roof safari vehicle" eyebrow="About us" title="A locally owned safari company, built in Kenya" lead={s.tagline ? `“${s.tagline}.”` : undefined} />
 
   <div class="container-page mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
     <div class="prose-safari text-lg">
@@ -42,7 +44,7 @@ const description =
         <h2 class="text-sm font-semibold tracking-wider text-ink-600 uppercase">Our mission</h2>
         <p class="mt-2 font-display text-2xl text-ink-900">{SITE.mission}</p>
         <h2 class="mt-6 text-sm font-semibold tracking-wider text-ink-600 uppercase">Our motto</h2>
-        <p class="mt-2 font-display text-2xl text-ink-900">{SITE.motto}</p>
+        <p class="mt-2 font-display text-2xl text-ink-900">{s.tagline}</p>
       </div>
       <div class="flex gap-3 rounded-md bg-reed-300/20 p-6">
         <Icon name="award" class="size-8 shrink-0 text-reed-700" />

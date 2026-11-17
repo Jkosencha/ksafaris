@@ -1,6 +1,5 @@
 ---
-import type { GetStaticPaths } from 'astro';
-import { getCollection, getEntries, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntries, getEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
@@ -12,16 +11,11 @@ import RouteMap from '../../components/RouteMap.astro';
 import { formatPrice, paragraphs } from '../../lib/format';
 import { touristTrip } from '../../lib/schema';
 
-export const getStaticPaths = (async () => {
-  const tours = await getCollection('tours');
-  return tours.map((tour) => ({ params: { slug: tour.id }, props: { tour } }));
-}) satisfies GetStaticPaths;
+import { siteOf } from '../../lib/site';
 
-interface Props {
-  tour: CollectionEntry<'tours'>;
-}
-
-const { tour } = Astro.props;
+// Rendered on each request: the tour is looked up from its address.
+const tour = Astro.params.slug ? await getEntry('tours', Astro.params.slug) : undefined;
+if (!tour) return Astro.rewrite('/404');
 const { title, summary, durationDays, route, flyTo, priceFrom, heroImage, heroAlt, itinerary, included, excluded } = tour.data;
 const destinations = await getEntries(tour.data.destinations);
 
@@ -36,6 +30,7 @@ const jsonLd = touristTrip(
   destinations,
   new URL(Astro.url.pathname, Astro.site),
   new URL(ogImage.src, Astro.site),
+  siteOf(Astro.locals).agencyName,
 );
 const nights = durationDays - 1;
 const facts = [

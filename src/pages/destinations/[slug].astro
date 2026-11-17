@@ -1,22 +1,14 @@
 ---
-import type { GetStaticPaths } from 'astro';
-import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import TourCard from '../../components/TourCard.astro';
 import DestinationCard from '../../components/DestinationCard.astro';
 import PhotoBand from '../../components/PhotoBand.astro';
 
-export const getStaticPaths = (async () => {
-  const destinations = await getCollection('destinations');
-  return destinations.map((destination) => ({ params: { slug: destination.id }, props: { destination } }));
-}) satisfies GetStaticPaths;
-
-interface Props {
-  destination: CollectionEntry<'destinations'>;
-}
-
-const { destination } = Astro.props;
+// Rendered on each request: the destination is looked up from its address.
+const destination = Astro.params.slug ? await getEntry('destinations', Astro.params.slug) : undefined;
+if (!destination) return Astro.rewrite('/404');
 const { name, tagline, summary, heroImage, heroAlt, facts, highlights } = destination.data;
 const { Content } = await render(destination);
 

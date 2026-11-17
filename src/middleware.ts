@@ -4,11 +4,15 @@ import { defineMiddleware } from 'astro:middleware';
 import { db, isDatabaseConfigured } from './lib/db/client';
 import { SESSION_COOKIE, clearSessionCookie, setSessionCookie, validateSession } from './lib/auth/session';
 import { allowed, homeFor, routeRule } from './lib/auth/permissions';
+import { loadSiteSettings } from './lib/site-settings-cache';
 
 const LOGIN = '/office/login';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
+  // The agency's details (Site settings) for every page; cached for a minute.
+  if (!pathname.startsWith('/_')) context.locals.settings = await loadSiteSettings();
+
   const isOffice = pathname === '/office' || pathname.startsWith('/office/');
   if (!isOffice || context.isPrerendered || pathname.startsWith(LOGIN)) return next();
 

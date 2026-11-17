@@ -7,7 +7,7 @@
  * Booking fields and steps are placeholders until the client confirms their process.
  */
 import { getCollection } from 'astro:content';
-import { CONTACT, whatsappLink } from '../consts';
+import { siteOf, whatsappHref } from '../lib/site';
 import Icon from './Icon.astro';
 import { FORM_ENDPOINT, fieldClass, labelClass } from '../lib/forms';
 
@@ -19,6 +19,7 @@ interface Props {
 
 const { tour, id = 'plan' } = Astro.props;
 
+const s = siteOf(Astro.locals);
 const tours = tour ? [] : (await getCollection('tours')).sort((a, b) => a.data.order - b.data.order);
 const endpoint = FORM_ENDPOINT;
 const waExplore = tour
@@ -51,7 +52,7 @@ const stageOption =
     action={endpoint}
     data-enquiry-form
     data-endpoint={endpoint}
-    data-email={CONTACT.email}
+    data-email={s.email}
   >
     <input type="hidden" name="subject" value="Safari enquiry" data-subject />
     {tour && <input type="hidden" name="tour" value={tour} data-label="Tour" data-tour />}
@@ -212,8 +213,8 @@ const stageOption =
     <div class="flex flex-col gap-3 sm:col-span-2">
       <button type="submit" class="btn-primary w-full py-3 text-base" data-text-book="Send booking request">Send enquiry</button>
       <a
-        href={whatsappLink(waExplore)}
-        data-href-book={whatsappLink(waBook)}
+        href={whatsappHref(s, waExplore)}
+        data-href-book={whatsappHref(s, waBook)}
         target="_blank"
         rel="noopener"
         class="btn w-full border border-whatsapp py-3 text-whatsapp hover:bg-whatsapp/5"

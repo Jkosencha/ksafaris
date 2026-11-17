@@ -2,33 +2,29 @@
 import { Image } from 'astro:assets';
 import tripadvisor from '../assets/images/brand/tripadvisor-badge.jpg';
 import safaribookings from '../assets/images/brand/safaribookings-badge.jpg';
-import { SOCIAL } from '../consts';
+import { siteOf } from '../lib/site';
 
 interface Props {
   class?: string;
 }
 const { class: className = '' } = Astro.props;
+const s = siteOf(Astro.locals);
+const badges = [
+  { href: s.tripadvisorUrl, src: tripadvisor, alt: 'Read our reviews on Tripadvisor' },
+  { href: s.safaribookingsUrl, src: safaribookings, alt: 'Read our reviews on SafariBookings' },
+].filter((b) => b.href);
 ---
 
-<ul class:list={['flex flex-wrap items-center gap-3', className]}>
-  <li>
-    <a
-      href={SOCIAL.tripadvisor}
-      target="_blank"
-      rel="noopener"
-      class="block rounded-md bg-white p-2 shadow-sm ring-1 ring-mist-200 transition hover:ring-reed-500"
-    >
-      <Image src={tripadvisor} alt="Read our reviews on Tripadvisor" class="h-14 w-auto" />
-    </a>
-  </li>
-  <li>
-    <a
-      href={SOCIAL.safaribookings}
-      target="_blank"
-      rel="noopener"
-      class="block rounded-md bg-white p-2 shadow-sm ring-1 ring-mist-200 transition hover:ring-reed-500"
-    >
-      <Image src={safaribookings} alt="Read our reviews on SafariBookings" class="h-14 w-auto" />
-    </a>
-  </li>
-</ul>
+{
+  badges.length > 0 && (
+    <ul class:list={['flex flex-wrap items-center gap-3', className]}>
+      {badges.map((b) => (
+        <li>
+          <a href={b.href!} target="_blank" rel="noopener" class="block rounded-md bg-white p-2 shadow-sm ring-1 ring-mist-200 transition hover:ring-reed-500">
+            <Image src={b.src} alt={b.alt} class="h-14 w-auto" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

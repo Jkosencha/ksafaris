@@ -5,16 +5,17 @@ import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import ReviewCard from '../components/ReviewCard.astro';
 import { getReviews } from '../lib/reviews';
-import { SOCIAL } from '../consts';
+import { siteOf } from '../lib/site';
 
 const reviews = await getReviews();
 
 const description =
   'Read independent reviews of KSafaris & African Expeditions on Tripadvisor and SafariBookings.';
+const s = siteOf(Astro.locals);
 const platforms = [
-  { name: 'Tripadvisor', href: SOCIAL.tripadvisor, icon: 'tripadvisor' as const, text: 'Guest reviews and photos from our safaris.' },
-  { name: 'SafariBookings', href: SOCIAL.safaribookings, icon: 'award' as const, text: 'Africa’s largest safari review platform.' },
-];
+  { name: 'Tripadvisor', href: s.tripadvisorUrl, icon: 'tripadvisor' as const, text: 'Guest reviews and photos from our safaris.' },
+  { name: 'SafariBookings', href: s.safaribookingsUrl, icon: 'award' as const, text: 'Africa’s largest safari review platform.' },
+].filter((p): p is typeof p & { href: string } => Boolean(p.href));
 ---
 
 <BaseLayout title="Reviews" description={description}>
@@ -67,8 +68,8 @@ const platforms = [
       <h2 class="text-2xl font-semibold sm:text-3xl">Travelled with us?</h2>
       <p class="mx-auto mt-2 max-w-lg text-ink-700">A short review helps other travellers find us. Thank you!</p>
       <div class="mt-6 flex flex-wrap justify-center gap-3">
-        <a href={SOCIAL.tripadvisor} target="_blank" rel="noopener" class="btn-primary">Review on Tripadvisor</a>
-        <a href={SOCIAL.safaribookings} target="_blank" rel="noopener" class="btn border border-moss-700 text-moss-700 hover:bg-moss-700/5">Review on SafariBookings</a>
+        {s.tripadvisorUrl && <a href={s.tripadvisorUrl} target="_blank" rel="noopener" class="btn-primary">Review on Tripadvisor</a>}
+        {s.safaribookingsUrl && <a href={s.safaribookingsUrl} target="_blank" rel="noopener" class="btn border border-moss-700 text-moss-700 hover:bg-moss-700/5">Review on SafariBookings</a>}
       </div>
     </div>
   </section>

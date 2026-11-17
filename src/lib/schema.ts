@@ -1,29 +1,30 @@
 import type { CollectionEntry } from 'astro:content';
-import { CONTACT, SITE, SOCIAL } from '../consts';
+import { SITE } from '../consts';
+import type { SiteSettings } from './services/site-settings';
 
 const ORG_ID = `${SITE.url}/#organization`;
 
-export function travelAgency(logoUrl?: string) {
+export function travelAgency(s: SiteSettings, logoUrl?: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'TravelAgency',
     '@id': ORG_ID,
-    name: SITE.name,
+    name: s.agencyName,
     alternateName: SITE.shortName,
     url: SITE.url,
     logo: logoUrl,
     description: SITE.description,
-    slogan: SITE.motto,
-    email: CONTACT.email,
-    telephone: CONTACT.phoneE164,
+    slogan: s.tagline ?? undefined,
+    email: s.email,
+    telephone: `+${s.phone.replace(/[^\d]/g, '')}`,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: CONTACT.city,
+      addressLocality: s.address?.split(',')[0]?.trim() || undefined,
       addressCountry: 'KE',
     },
     areaServed: ['Kenya', 'Tanzania', 'Uganda', 'Rwanda', 'Zanzibar'],
     award: SITE.award,
-    sameAs: [SOCIAL.facebook, SOCIAL.instagram, SOCIAL.x, SOCIAL.tripadvisor, SOCIAL.safaribookings],
+    sameAs: [s.facebookUrl, s.instagramUrl, s.tiktokUrl, s.xUrl, s.tripadvisorUrl, s.safaribookingsUrl].filter(Boolean),
   };
 }
 
@@ -32,6 +33,7 @@ export function touristTrip(
   destinations: CollectionEntry<'destinations'>[],
   pageUrl: URL,
   imageUrl: URL,
+  agencyName: string,
 ) {
   const { title, summary, durationDays, route, priceFrom } = tour.data;
   return {
@@ -44,7 +46,7 @@ export function touristTrip(
     touristType: ['Wildlife safari', 'Tailor-made travel'],
     // ISO 8601 duration, e.g. P13D
     duration: `P${durationDays}D`,
-    provider: { '@id': ORG_ID, '@type': 'TravelAgency', name: SITE.name, url: SITE.url },
+    provider: { '@id': ORG_ID, '@type': 'TravelAgency', name: agencyName, url: SITE.url },
     itinerary: {
       '@type': 'ItemList',
       numberOfItems: route.length,
